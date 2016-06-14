@@ -6,8 +6,8 @@
     src = fetchFromGitHub {
       owner = "matthewbauer";
       repo = "nix-bootstrap";
-      rev = "47bc67bbc5cd71fba9c9b0d07f967023b94e8ffa";
-      sha256 = "1jy52hhmbdn1hgc10x73kqx8dc38piz589mjbj07rp4vx0qc9alw";
+      rev = "cc882b2cb92d8de87dad9cb890ad1745b06a9787";
+      sha256 = "05w6xjg0cgz6a4szc7jd7v53bmy4zjrgph5xkgyj73g62jyq7ajf";
     };
 
     propagatedBuildInputs = [ nix cacert ];
