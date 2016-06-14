@@ -6,17 +6,20 @@ let
 
   makeself = callPackage ./makeself.nix {};
   makedir = callPackage ./makedir.nix {};
+
   nix-bootstrap = callPackage ./nix-bootstrap.nix {};
 
-  nixdir = makedir {
-    name = "nixdir";
-    toplevel = nix-bootstrap;
-  };
+  makebootstrap = {name, script}:
+    makeself {
+      inherit name;
+      startup = ".${script}/install";
+      archive = makedir {
+        name = "${name}-dir";
+	toplevel = script;
+      };
+    };
 
-in
-
-  makeself {
-    name = "nix-installer.sh";
-    startup = ".${nix-bootstrap}/install";
-    archive = nixdir;
-  }
+in makebootstrap {
+  name = "nix-bootstrap.sh";
+  script = nix-bootstrap;
+}
