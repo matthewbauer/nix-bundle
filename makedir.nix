@@ -7,8 +7,9 @@
     exportReferencesGraph = [ "closure" toplevel ];
     buildInputs = [ perl ];
     buildCommand = ''
-      storePaths=$(${perl}/bin/perl ${pathsFromGraph} ./closure)
       mkdir -p $out
+      storePaths=$(${perl}/bin/perl ${pathsFromGraph} ./closure)
+      printRegistration=1 ${perl}/bin/perl ${pathsFromGraph} ./closure > $out/.reginfo
       for path in $storePaths; do
         cp --parents -r $path $out/
       done
