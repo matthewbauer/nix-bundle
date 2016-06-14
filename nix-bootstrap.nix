@@ -1,22 +1,14 @@
-{ stdenv, fetchFromGitHub, nix, cacert }:
+{nixpkgs ? import <nixpkgs> {}}:
 
-  stdenv.mkDerivation {
-    name = "nix-bootstrap";
+with nixpkgs;
 
-    src = fetchFromGitHub {
-      owner = "matthewbauer";
-      repo = "nix-bootstrap";
-      rev = "cc882b2cb92d8de87dad9cb890ad1745b06a9787";
-      sha256 = "05w6xjg0cgz6a4szc7jd7v53bmy4zjrgph5xkgyj73g62jyq7ajf";
-    };
+let
 
-    propagatedBuildInputs = [ nix cacert ];
+  makebootstrap = callPackage ./makebootstrap.nix {};
+  install-nix-from-closure = callPackage ./install-nix-from-closure.nix {};
 
-    installPhase = ''
-      mkdir -p $out/
-      substitute install-nix-from-closure.sh $out/install \
-        --subst-var-by nix .${nix} \
-        --subst-var-by cacert .${cacert}
-      chmod +x $out/install
-    '';
-  }
+in makebootstrap {
+  name = "nix-bootstrap.sh";
+  target = install-nix-from-closure;
+  run = "/install";
+}
