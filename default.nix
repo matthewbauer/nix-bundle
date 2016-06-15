@@ -6,6 +6,7 @@ let
 
   makeself = callPackage ./makeself.nix {};
   makedir = callPackage ./makedir.nix {};
+  nix-installer = callPackage ./nix-installer.nix {};
 
   makebootstrap = callPackage ./makebootstrap.nix {
     inherit makedir makeself;
@@ -28,4 +29,9 @@ in {
     run = "/stage1.sh";
   };
 
+  nixInstaller = makebootstrap {
+    name = "nix-installer.sh";
+    target = nix-installer;
+    run = "/install";
+  };
 }
