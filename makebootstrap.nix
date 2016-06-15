@@ -1,13 +1,4 @@
-{nixpkgs ? import <nixpkgs> {}}:
-
-with nixpkgs;
-
-let
-
-  makeself = callPackage ./makeself.nix {};
-  makedir = callPackage ./makedir.nix {};
-
-in
+{makeself, makedir}:
 
   { name, target, run }:
     makeself {
