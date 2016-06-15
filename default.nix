@@ -20,11 +20,17 @@ let
 
 in {
 
-  versionTest = makebootstrap {
+  helloBundle = makebootstrap {
+    name = "hello";
+    target = hello;
+    run = "/bin/hello";
+  };
+
+  nixShellBundle = makebootstrap {
     name = "nix-bootstrap.sh";
     target = nix-bootstrap {
       name = "nix-bootstrap";
-      stage3 = "nix-env --version";
+      stage3 = "nix-shell --pure --packages bash --comand bash";
     };
     run = "/stage1.sh";
   };
