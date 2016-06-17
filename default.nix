@@ -20,47 +20,38 @@ let
   nix-user-chroot = callPackage ./nix-user-chroot.nix {};
 
   nix-bootstrap = callPackage ./nix-bootstrap.nix {
-    inherit nix-user-chroot;
+    inherit nix-user-chroot makebootstrap;
   };
 
 in {
 
-  helloBundle = makebootstrap {
+  hello = nix-bootstrap {
     name = "hello";
     target = hello;
     run = "/bin/hello";
   };
 
-  firefoxBundle = makebootstrap {
+  firefox = nix-bootstrap {
     name = "firefox";
     target = firefox;
     run = "/bin/firefox";
   };
 
-  nanoBundle = makebootstrap {
+  nano = nix-bootstrap {
     name = "nano";
     target = nano;
     run = "/bin/nano";
   };
 
-  emacsBundle = makebootstrap {
+  emacs = nix-bootstrap {
     name = "emacs";
     target = emacs;
     run = "/bin/emacs";
   };
 
-  nixShellBundle = makebootstrap {
-    name = "nix-bootstrap.sh";
-    target = nix-bootstrap {
-      name = "nix-bootstrap";
-      stage3 = "nix-shell --pure --packages bash --comand bash";
-    };
-    run = "/stage1.sh";
-  };
-
   nixInstaller = makebootstrap {
     name = "nix-installer.sh";
-    target = nix-installer;
-    run = "/install";
+    targets = [ nix-installer ];
+    startup = ".${nix-installer}/install";
   };
 }
