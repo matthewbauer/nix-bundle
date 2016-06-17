@@ -26,6 +26,24 @@ in {
     run = "/bin/hello";
   };
 
+  firefoxBundle = makebootstrap {
+    name = "firefox";
+    target = firefox;
+    run = "/bin/firefox";
+  };
+
+  nanoBundle = makebootstrap {
+    name = "nano";
+    target = nano;
+    run = "/bin/nano";
+  };
+
+  emacsBundle = makebootstrap {
+    name = "emacs";
+    target = emacs;
+    run = "/bin/emacs";
+  };
+
   nixShellBundle = makebootstrap {
     name = "nix-bootstrap.sh";
     target = nix-bootstrap {

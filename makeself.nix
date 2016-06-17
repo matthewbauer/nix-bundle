@@ -9,6 +9,6 @@
     inherit name archive startup;
     nativeBuildInputs = [ makeself ];
     buildCommand = ''
-      ${makeself}/bin/makeself $archive $out $name $startup
+      ${makeself}/bin/makeself --xz $archive $out $name $startup
     '';
   }

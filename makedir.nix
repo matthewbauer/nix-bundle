@@ -5,7 +5,7 @@
   stdenv.mkDerivation {
     inherit toplevel name;
     exportReferencesGraph = [ "closure" toplevel ];
-    buildInputs = [ perl ];
+    nativeBuildInputs = [ perl ];
     buildCommand = ''
       mkdir -p $out
       storePaths=$(${perl}/bin/perl ${pathsFromGraph} ./closure)
