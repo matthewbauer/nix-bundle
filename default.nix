@@ -4,12 +4,17 @@ with nixpkgs;
 
 let
 
-  makeself = callPackage ./makeself.nix {};
-  makedir = callPackage ./makedir.nix {};
+  arx = callPackage ./arx.nix {
+    inherit (haskellPackages) arx;
+  };
+
+  maketar = callPackage ./maketar.nix {
+  };
+
   nix-installer = callPackage ./nix-installer.nix {};
 
   makebootstrap = callPackage ./makebootstrap.nix {
-    inherit makedir makeself;
+    inherit arx maketar;
   };
 
   nix-user-chroot = callPackage ./nix-user-chroot.nix {};

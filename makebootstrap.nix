@@ -1,11 +1,10 @@
-{makeself, makedir}:
+{ arx, maketar }:
 
   { name, target, run }:
-    makeself {
+    arx {
       inherit name;
-      startup = ".${target}${run}";
-      archive = makedir {
-        name = "${name}-dir";
-        toplevel = target;
+      startup = "${target}${run}";
+      archive = maketar {
+        inherit name target;
       };
     }
