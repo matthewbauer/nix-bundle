@@ -2,9 +2,13 @@
 
   stdenv.mkDerivation {
     name = "nix-user-chroot";
-    buildCommand = ''
+    phases = [ "buildPhase" "installPhase" "fixupPhase" ];
+    buildPhase = ''
       cp ${./nix-user-chroot.c} nix-user-chroot.c
+      $CC nix-user-chroot.c -o nix-user-chroot
+    '';
+    installPhase = ''
       mkdir -p $out/bin/
-      cc nix-user-chroot.c -o $out/bin/nix-user-chroot
+      cp nix-user-chroot $out/bin/nix-user-chroot
     '';
   }
