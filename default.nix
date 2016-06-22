@@ -8,8 +8,7 @@ let
     inherit (haskellPackages) arx;
   };
 
-  maketar = callPackage ./maketar.nix {
-  };
+  maketar = callPackage ./maketar.nix {};
 
   nix-installer = callPackage ./nix-installer.nix {};
 
