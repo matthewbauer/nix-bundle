@@ -16,10 +16,8 @@ let
     inherit arx maketar;
   };
 
-  nix-user-chroot = callPackage ./nix-user-chroot.nix {};
-
   nix-bootstrap = callPackage ./nix-bootstrap.nix {
-    inherit nix-user-chroot makebootstrap;
+    inherit makebootstrap;
   };
 
 in {

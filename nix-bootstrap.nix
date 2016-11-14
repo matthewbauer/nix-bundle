@@ -1,9 +1,9 @@
-{ stdenv, writeText, nix-user-chroot, makebootstrap }:
+{ stdenv, writeText, proot, makebootstrap }:
 
 { name, target, run }:
 
   makebootstrap {
     inherit name;
-    startup = ".${nix-user-chroot}/bin/nix-user-chroot ./nix ${target}${run}";
-    targets = [ nix-user-chroot target ];
+    startup = ".${proot}/bin/proot -b./nix:/nix ${target}${run}";
+    targets = [ proot target ];
   }
