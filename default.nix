@@ -42,7 +42,7 @@ in {
 
   emacs = nix-bootstrap {
     name = "emacs";
-    target = emacs24-nox;
+    target = emacs;
     run = "/bin/emacs";
   };
 
