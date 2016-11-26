@@ -3,5 +3,5 @@
 to run:
 
 ```sh
-nix-build
+./nix-bundle.sh TARGET EXECUTABLE
 ```

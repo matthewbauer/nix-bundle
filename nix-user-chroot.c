@@ -1,3 +1,10 @@
+/*
+ * This file is based on @lethalman's nix-user-chroot. This file has
+ * diverged from it though.
+ *
+ * Usage: nix-user-chroot <nixpath> <command>
+ */
+
 #define _GNU_SOURCE
 #include <sched.h>
 #include <unistd.h>

@@ -2,7 +2,7 @@
 
 with nixpkgs;
 
-let
+rec {
 
   arx = callPackage ./arx.nix {
     inherit (haskellPackages) arx;
@@ -22,35 +22,4 @@ let
     inherit nix-user-chroot makebootstrap;
   };
 
-in {
-
-  hello = nix-bootstrap {
-    name = "hello";
-    target = hello;
-    run = "/bin/hello";
-  };
-
-  firefox = nix-bootstrap {
-    name = "firefox";
-    target = firefox;
-    run = "/bin/firefox";
-  };
-
-  nano = nix-bootstrap {
-    name = "nano";
-    target = nano;
-    run = "/bin/nano";
-  };
-
-  emacs = nix-bootstrap {
-    name = "emacs";
-    target = emacs;
-    run = "/bin/emacs";
-  };
-
-  nixInstaller = makebootstrap {
-    name = "nix-installer.sh";
-    targets = [ nix-installer ];
-    startup = ".${nix-installer}/install";
-  };
 }

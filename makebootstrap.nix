@@ -1,9 +1,9 @@
 { arx, maketar }:
+{ name, targets, startup }:
 
-  { name, targets, startup }:
-    arx {
-      inherit name startup;
-      archive = maketar {
-        inherit name targets;
-      };
-    }
+arx {
+  inherit name startup;
+  archive = maketar {
+    inherit name targets;
+  };
+}
