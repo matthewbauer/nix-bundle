@@ -24,6 +24,6 @@ exec="$2"
 
 expr="with import <nixpkgs> {}; with import ./. {}; nix-bootstrap { name = \"$target\"; target = $target; run = \"$exec\"; }"
 
-out=$(nix-store -r $(nix-instantiate -E "$expr"))
+out=$(nix-store --no-gc-warning -r $(nix-instantiate --no-gc-warning -E "$expr"))
 
 cp -f $out $target
