@@ -1,18 +1,21 @@
-{ stdenv, fetchFromGitHub, patchelf }:
+{ stdenv, fetchFromGitHub }:
 
 stdenv.mkDerivation {
-  name = "nix-user-chroot";
-  phases = [ "buildPhase" "fixupPhase" "installPhase" ];
+  name = "nix-user-chroot-2b144e";
 
-  buildPhase = ''
-    cp ${./nix-user-chroot.c} nix-user-chroot.c
-    $CC nix-user-chroot.c -o nix-user-chroot
-  '';
+  src = fetchFromGitHub {
+    owner = "matthewbauer";
+    repo = "nix-user-chroot";
+    rev = "2b144ee89568ba40b66317da261ce889fbda3674";
+    sha256 = "16bmshhvk6941w04rx78i5a1305876qni2n2rvm7rkziz49j158n";
+  };
 
-  # setup local libc interpreter
-  fixupPhase = ''
-    patchelf --set-interpreter .$(patchelf --print-interpreter nix-user-chroot) nix-user-chroot
-    patchelf --set-rpath $(patchelf --print-rpath nix-user-chroot | sed 's|/nix/store/|./nix/store/|g') nix-user-chroot
+  postFixup = ''
+    exe=$out/bin/nix-user-chroot
+    patchelf \
+      --set-interpreter .$(patchelf --print-interpreter $exe) \
+      --set-rpath $(patchelf --print-rpath $exe | sed 's|/nix/store/|./nix/store/|g') \
+      $exe
   '';
 
   installPhase = ''
