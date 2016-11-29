@@ -46,7 +46,12 @@ Some others to try:
 
 ## Comparison with AppImage, FlatPak, Snappy
 
-TODO
+| Name       | Distro-agnostic | Runtime required | Root required | Storage | Packaged size of vlc |
+| ---------- | --------------- | ---------------- | ------------- | ------- | -------------------- |
+| nix-bundle | yes | no  | no  | Arx tarball                    | 176M | 
+| AppImage   | yes | no  | no  | ISO 9660 w/ zisofs compression | 80M  |
+| FlatPak    | yes | yes | no  | ?                              | ?    |
+| Snappy     | yes | yes | yes | squashFS                       | 115M |
 
 ## How it works
 
