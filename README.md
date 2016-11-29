@@ -1,5 +1,7 @@
 # nix-bundle
 
+nix-bundle is a way to package Nix attributes into single-file executables.
+
 ## Benefits
 
 * Single-file output
