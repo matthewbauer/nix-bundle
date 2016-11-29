@@ -9,7 +9,7 @@ stdenv.mkDerivation {
     storePaths=$(${perl}/bin/perl ${pathsFromGraph} ./closure-*)
 
     # printRegistration=1 ${perl}/bin/perl ${pathsFromGraph} ./closure-* > .reginfo
-    tar cfjv $out \
+    tar cfj $out \
       --owner=0 --group=0 --mode=u+rw,uga+r \
       --hard-dereference \
       $storePaths
