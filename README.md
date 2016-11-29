@@ -54,7 +54,7 @@ Nix-bundle glues together four different projects to work correctly:
 
 * [Arx](https://github.com/solidsnack/arx) - an archive execution tool
   * Creates single-file archive executable that can unpack themselves and then run some command. nix-bundle calls nix-user-chroot to bootstrap the Nix environment. It outputs a "./nix" folder.
-* [nix-user-chroot](https://github.com/lethalman/nix-user-chroot] - a small bootstrap that uses Linux namespaces to call chroot
+* [nix-user-chroot](https://github.com/lethalman/nix-user-chroot) - a small bootstrap that uses Linux namespaces to call chroot
   * This will create sub namespace and bind mount the "./nix" to "/nix" so that the Nix references function properly.
 * [Nix](https://nixos.org/nix/) - a functional package manager
   * Used to build runtime closures that are self-contained.
