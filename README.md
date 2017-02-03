@@ -51,7 +51,7 @@ Some others to try:
 | nix-bundle | yes | no  | no  | Arx tarball                    | 176M | 
 | AppImage   | yes | no  | no  | ISO 9660 w/ zisofs compression | 80M  |
 | FlatPak    | yes | yes | no  | ?                              | ?    |
-| Snappy     | yes | yes | yes | squashFS                       | 115M |
+| Snappy     | yes | yes | no  | squashFS                       | 115M |
 
 ## How it works
 
