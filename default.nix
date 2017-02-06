@@ -22,4 +22,11 @@ rec {
     inherit nix-user-chroot makebootstrap;
   };
 
+  appimagetool = callPackage ./appimagetool.nix {};
+
+  appimage = callPackage ./appimage.nix {
+    inherit appimagetool;
+  };
+
+  appdir = callPackage ./appdir.nix {};
 }
