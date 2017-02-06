@@ -44,12 +44,32 @@ Some others to try:
 ./nix-bundle.sh emacs /bin/emacs
 ```
 
+## [Experimental] Create AppImage executables from Nix expressions
+
+"nix-bundle.sh" tends to create fairly large outputs. This is largely because nix-bundle.sh uses gzip compression and AppImage uses lzma compression. Anyway, you can create a compliant "AppImage" using the "nix2appimage.sh" script:
+
+```sh
+./nix2appimage.sh emacs
+```
+
+Notice that there is only one argument for nix2appimage.sh. This is because the target executable will be detected from the .desktop file in ```/share/applications/*.desktop```. As a side-effect, AppImage requires your package to have a .desktop file, so packages like "hello", "coreutils", etc. will not work.
+
+Some other examples to try:
+
+```sh
+./nix2appimage.sh firefox
+./nix2appimage.sh vlc
+./nix2appimage.sh allegro
+```
+
+These may take a while because of the large closure size.
+
 ## Comparison with AppImage, FlatPak, Snappy
 
 | Name       | Distro-agnostic | Runtime required | Root required | Storage | Packaged size of vlc |
 | ---------- | --------------- | ---------------- | ------------- | ------- | -------------------- |
 | nix-bundle | yes | no  | no  | Arx tarball                    | 176M | 
-| AppImage   | yes | no  | no  | ISO 9660 w/ zisofs compression | 80M  |
+| AppImage   | yes | no  | no  | Squashfs w/ lzma compression   | 80M  |
 | FlatPak    | yes | yes | no  | ?                              | ?    |
 | Snappy     | yes | yes | no  | squashFS                       | 115M |
 
