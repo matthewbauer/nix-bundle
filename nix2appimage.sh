@@ -23,4 +23,11 @@ expr="with import <nixpkgs> {}; with import ./. {}; appimage (appdir { name = \"
 
 out=$(nix-store --no-gc-warning -r $(nix-instantiate --no-gc-warning -E "$expr"))
 
-cp -f $out $target
+if [ -z "$out" ]; then
+  echo "$0 failed. Exiting."
+  exit 1
+else
+  appimage=$out/*.AppImage
+  cp -f $appimage .
+  echo "AppImage created at $(basename $appimage)"
+fi

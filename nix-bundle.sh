@@ -26,4 +26,9 @@ expr="with import <nixpkgs> {}; with import ./. {}; nix-bootstrap { name = \"$ta
 
 out=$(nix-store --no-gc-warning -r $(nix-instantiate --no-gc-warning -E "$expr"))
 
-cp -f $out $target
+if [ -z "$out" ]; then
+  echo "$0 failed. Exiting."
+  exit 1
+else
+  cp -f $out $target
+fi
