@@ -2,9 +2,11 @@
 dir:
 
 stdenv.mkDerivation {
-  name = "appimage.AppImage";
+  name = "appimage";
   buildInputs = [ appimagetool ];
   buildCommand = ''
-    appimagetool ${dir} $out
+    appimagetool ${dir}/*.AppDir
+    mkdir $out
+    cp *.AppImage $out
   '';
 }
