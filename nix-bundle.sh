@@ -30,5 +30,6 @@ if [ -z "$out" ]; then
   echo "$0 failed. Exiting."
   exit 1
 else
+  echo "Nix bundle created at $target."
   cp -f $out $target
 fi
