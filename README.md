@@ -52,33 +52,45 @@ Some others to try:
 ./nix2appimage.sh emacs
 ```
 
+This will create a file at Emacs-x86_64.AppImage which you can execute.
+
 Notice that there is only one argument for nix2appimage.sh. This is because the target executable will be detected from the .desktop file in ```/share/applications/*.desktop```. As a side-effect, AppImage requires your package to have a .desktop file, so packages like "hello", "coreutils", etc. will not work.
 
 Some other examples to try:
 
 ```sh
 ./nix2appimage.sh firefox
+```
+
+```sh
 ./nix2appimage.sh vlc
-./nix2appimage.sh allegro
+```
+
+```sh
+./nix2appimage.sh 0ad
+```
+
+```sh
+./nix2appimage.sh wireshark-gtk
 ```
 
 These may take a while because of the large closure size.
 
 ## Comparison with AppImage, FlatPak, Snappy
 
-| Name       | Distro-agnostic | Runtime required | Root required | Storage | Packaged size of vlc |
-| ---------- | --------------- | ---------------- | ------------- | ------- | -------------------- |
-| nix-bundle | yes | no  | no  | Arx tarball                    | 176M | 
-| AppImage   | yes | no  | no  | Squashfs w/ lzma compression   | 80M  |
-| FlatPak    | yes | yes | no  | ?                              | ?    |
-| Snappy     | yes | yes | no  | squashFS                       | 115M |
+| Name       | Distro-agnostic | Runtime required | Root required | Storage |
+| ---------- | --------------- | ---------------- | ------------- | ------- |
+| nix-bundle | yes | no  | no  | Arx tarball                    | 
+| AppImage   | yes | no  | no  | Squashfs w/ lzma compression   |
+| FlatPak    | yes | yes | no  | ?                              |
+| Snappy     | yes | yes | no  | squashFS                       |
 
 ## How it works
 
 Nix-bundle glues together four different projects to work correctly:
 
 * [Arx](https://github.com/solidsnack/arx) - an archive execution tool
-  * Creates single-file archive executable that can unpack themselves and then run some command. nix-bundle calls nix-user-chroot to bootstrap the Nix environment. It outputs a "./nix" folder.
+* Creates single-file archive executable that can unpack themselves and then run some command. nix-bundle calls nix-user-chroot to bootstrap the Nix environment. It outputs a "./nix" folder.
 * [nix-user-chroot](https://github.com/lethalman/nix-user-chroot) - a small bootstrap that uses Linux namespaces to call chroot
   * This will create sub namespace and bind mount the "./nix" to "/nix" so that the Nix references function properly.
 * [Nix](https://nixos.org/nix/) - a functional package manager
