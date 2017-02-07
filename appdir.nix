@@ -25,27 +25,41 @@ in
       fi
 
       storePaths=$(${perl}/bin/perl ${pathsFromGraph} ./closure-*)
-      mkdir -p $out/nix/store
-      cp -r $storePaths $out/nix/store
 
-      cd $out
+      mkdir -p $out/${name}.AppDir
+      cd $out/${name}.AppDir
 
-      ln -s .${target} $out/usr
+      mkdir -p nix/store
+      cp -r $storePaths nix/store
+
+      ln -s .${target} usr
+
+      if [ -d ${target}/share/appdata ]; then
+        chmod a+w usr/share
+        mkdir -p usr/share/metainfo
+        for f in ${target}/share/appdata/*.xml; do
+          ln -s .$f usr/share/metainfo
+        done
+      fi
 
       # .desktop
-      if [ -d ${target}/share/applications ]; then
-        desktop=$(find ${target}/share/applications -name "*.desktop" | head -n1)
-        if ! [ -z "$desktop" ]; then
-          ln -s .$desktop $out
-        fi
+      desktop=$(find ${target}/share/applications -name "*.desktop" | head -n1)
+      if ! [ -z "$desktop" ]; then
+        ln -s .$desktop
       fi
 
       # icons
       if [ -d ${target}/share/icons ]; then
-        icon=$(find ${target}/share/icons -name "${name}.png" | head -n1)
+        icon=$(find ${target}/share/icons -name "${name}.png" -or -name "*.png" | head -n1)
         if ! [ -z "$icon" ]; then
-          ln -s .$icon $out
+          ln -s .$icon
           ln -s .$icon .DirIcon
+        else
+          icon=$(find ${target}/share/icons -name "${name}.svg" -or -name "*.svg" | head -n1)
+          if ! [ -z "$icon" ]; then
+            ln -s .$icon
+            ln -s .$icon .DirIcon
+          fi
         fi
       fi
 
