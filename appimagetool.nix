@@ -1,4 +1,4 @@
-{ stdenv, fetchurl }:
+{ stdenv, fetchurl, fuse, zlib }:
 
 # This is from some binaries.
 
@@ -16,8 +16,12 @@ stdenv.mkDerivation rec {
   sourceRoot = "squashfs-root";
 
   unpackPhase = ''
-    chmod a+x $src
-    $src --appimage-extract
+    cp $src appimagetool-x86_64.AppImage
+    chmod u+wx appimagetool-x86_64.AppImage
+    patchelf --set-interpreter $(cat $NIX_CC/nix-support/dynamic-linker) \
+             --set-rpath ${fuse}/lib:${zlib}/lib \
+             appimagetool-x86_64.AppImage
+    ./appimagetool-x86_64.AppImage --appimage-extract
   '';
 
   installPhase = ''
