@@ -21,7 +21,7 @@ Once you have a working Nix install, you can run:
 $ ./nix-bundle.sh hello /bin/hello
 ```
 
-This will create the file "hello". Running it:
+```hello``` indicates the Nix derivation from NixPkgs that you want to use, while ```/bin/hello``` indicates the path of the executable relative to ```hello``` that you want to run. This will create the file "hello". Running it:
 
 ```sh
 $ ./hello
