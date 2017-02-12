@@ -2,8 +2,8 @@
 
 let
   AppRun = fetchurl {
-    url = "https://github.com/probonopd/AppImageKit/releases/download/6/AppRun_6-x86_64";
-    sha256 = "1i0hr4ag6jz3h27c80ir2rswq91khw0cq9fqylg23l6pmjgwbf98";
+    url = "https://github.com/probonopd/AppImageKit/releases/download/7/AppRun-x86_64";
+    sha256 = "1k2jlyrrbzdmxv832a5vin4nzs3rh9r9vs7a8jzrl1v5bbh16nqf";
   };
 
 in

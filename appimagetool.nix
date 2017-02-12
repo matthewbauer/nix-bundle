@@ -9,8 +9,8 @@ stdenv.mkDerivation rec {
   name = "appimagekit";
 
   src = fetchurl {
-    url = "https://github.com/probonopd/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage";
-    sha256 = "0l3hxp169dpyj3h38q9nsnh1cynam1j5zx8q362p93448rhm7d0y";
+    url = "https://github.com/probonopd/AppImageKit/releases/download/7/appimagetool-x86_64.AppImage";
+    sha256 = "1irvbf0xnya16cyzpvr43jviq5ly3wl7b9753rji7d1hhxwb7b9r";
   };
 
   sourceRoot = "squashfs-root";
