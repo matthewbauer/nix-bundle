@@ -21,8 +21,9 @@ fi
 
 target="$1"
 exec="$2"
+filename=$(basename $exec)
 
-expr="with import <nixpkgs> {}; with import ./. {}; nix-bootstrap { name = \"$target\"; target = $target; run = \"$exec\"; }"
+expr="with import <nixpkgs> {}; with import ./. {}; nix-bootstrap { name = \"$filename\"; target = $target; run = \"$exec\"; }"
 
 out=$(nix-store --no-gc-warning -r $(nix-instantiate --no-gc-warning -E "$expr"))
 
@@ -30,6 +31,6 @@ if [ -z "$out" ]; then
   echo "$0 failed. Exiting."
   exit 1
 else
-  echo "Nix bundle created at $target."
-  cp -f $out $target
+  echo "Nix bundle created at $filename."
+  cp -f $out $filename
 fi
