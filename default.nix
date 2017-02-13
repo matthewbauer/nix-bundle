@@ -29,4 +29,6 @@ rec {
   };
 
   appdir = callPackage ./appdir.nix {};
+
+  closure = callPackage ./closure.nix {};
 }
