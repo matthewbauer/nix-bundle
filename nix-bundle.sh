@@ -21,7 +21,6 @@ fi
 
 target="$1"
 exec="$2"
-filename=$(basename $exec)
 
 nix_file=`dirname $0`/default.nix
 
@@ -30,9 +29,12 @@ expr="with import <nixpkgs> {}; with import $nix_file {}; nix-bootstrap { target
 out=$(nix-store --no-gc-warning -r $(nix-instantiate --no-gc-warning -E "$expr"))
 
 if [ -z "$out" ]; then
-  echo "$0 failed. Exiting."
+  >&2 echo "$0 failed. Exiting."
   exit 1
-else
+elif [ -t 1 ]; then
+  filename=$(basename $exec)
   echo "Nix bundle created at $filename."
   cp -f $out $filename
+else
+  cat $out
 fi
