@@ -3,32 +3,64 @@
 with nixpkgs;
 
 rec {
+  arx = { archive, startup}:
+    stdenv.mkDerivation {
+      name = "arx";
+      buildCommand = ''
+        ${haskellPackages.arx}/bin/arx tmpx ${archive} -o $out // ${startup}
+        chmod +x $out
+      '';
+    };
 
-  arx = callPackage ./arx.nix {
-    inherit (haskellPackages) arx;
+  maketar = { targets }:
+    stdenv.mkDerivation {
+      name = "maketar";
+      exportReferencesGraph = map (x: [("closure-" + baseNameOf x) x]) targets;
+      buildCommand = ''
+        storePaths=$(${perl}/bin/perl ${pathsFromGraph} ./closure-*)
+
+        # printRegistration=1 ${perl}/bin/perl ${pathsFromGraph} ./closure-* > .reginfo
+        tar cfj $out \
+          --owner=0 --group=0 --mode=u+rw,uga+r \
+          --hard-dereference \
+          $storePaths
+      '';
+    };
+
+  nix-user-chroot = stdenv.mkDerivation {
+    name = "nix-user-chroot-2b144e";
+    src = fetchFromGitHub {
+      owner = "matthewbauer";
+      repo = "nix-user-chroot";
+      rev = "2b144ee89568ba40b66317da261ce889fbda3674";
+      sha256 = "16bmshhvk6941w04rx78i5a1305876qni2n2rvm7rkziz49j158n";
+    };
+
+    postFixup = ''
+      exe=$out/bin/nix-user-chroot
+      patchelf \
+        --set-interpreter .$(patchelf --print-interpreter $exe) \
+        --set-rpath $(patchelf --print-rpath $exe | sed 's|/nix/store/|./nix/store/|g') \
+        $exe
+    '';
+
+    installPhase = ''
+      mkdir -p $out/bin/
+      cp nix-user-chroot $out/bin/nix-user-chroot
+    '';
   };
 
-  maketar = callPackage ./maketar.nix {};
+  makebootstrap = { targets, startup }:
+    arx {
+      inherit startup;
+      archive = maketar {
+        inherit targets;
+      };
+    };
 
-  nix-installer = callPackage ./nix-installer.nix {};
-
-  makebootstrap = callPackage ./makebootstrap.nix {
-    inherit arx maketar;
-  };
-
-  nix-user-chroot = callPackage ./nix-user-chroot.nix {};
-
-  nix-bootstrap = callPackage ./nix-bootstrap.nix {
-    inherit nix-user-chroot makebootstrap;
-  };
-
-  appimagetool = callPackage ./appimagetool.nix {};
-
-  appimage = callPackage ./appimage.nix {
-    inherit appimagetool;
-  };
-
-  appdir = callPackage ./appdir.nix {};
-
-  closure = callPackage ./closure.nix {};
+  nix-bootstrap = { target, run }:
+    makebootstrap {
+      startup = ".${nix-user-chroot}/bin/nix-user-chroot ./nix ${target}${run}";
+      targets = [ nix-user-chroot target ];
+    };
 }

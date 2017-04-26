@@ -23,7 +23,9 @@ target="$1"
 exec="$2"
 filename=$(basename $exec)
 
-expr="with import <nixpkgs> {}; with import ./. {}; nix-bootstrap { name = \"$filename\"; target = $target; run = \"$exec\"; }"
+nix_file=./default.nix
+
+expr="with import <nixpkgs> {}; with import $nix_file {}; nix-bootstrap { target = $target; run = \"$exec\"; }"
 
 out=$(nix-store --no-gc-warning -r $(nix-instantiate --no-gc-warning -E "$expr"))
 
