@@ -23,7 +23,7 @@ target="$1"
 exec="$2"
 filename=$(basename $exec)
 
-nix_file=./default.nix
+nix_file=`dirname $0`/default.nix
 
 expr="with import <nixpkgs> {}; with import $nix_file {}; nix-bootstrap { target = $target; run = \"$exec\"; }"
 
