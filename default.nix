@@ -60,7 +60,7 @@ rec {
 
   nix-bootstrap = { target, run }:
     makebootstrap {
-      startup = ".${nix-user-chroot}/bin/nix-user-chroot ./nix ${target}${run}";
+      startup = ''.${nix-user-chroot}/bin/nix-user-chroot ./nix ${target}${run} \$@'';
       targets = [ nix-user-chroot target ];
     };
 }
