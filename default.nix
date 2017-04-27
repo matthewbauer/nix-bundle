@@ -7,7 +7,7 @@ rec {
     stdenv.mkDerivation {
       name = "arx";
       buildCommand = ''
-        ${haskellPackages.arx}/bin/arx tmpx ${archive} -o $out // ${startup}
+        ${haskellPackages.arx}/bin/arx tmpx ${archive} -rm! -o $out // ${startup}
         chmod +x $out
       '';
     };
@@ -15,11 +15,11 @@ rec {
   maketar = { targets }:
     stdenv.mkDerivation {
       name = "maketar";
+      buildInputs = [gnutar perl bzip2];
       exportReferencesGraph = map (x: [("closure-" + baseNameOf x) x]) targets;
       buildCommand = ''
-        storePaths=$(${perl}/bin/perl ${pathsFromGraph} ./closure-*)
+        storePaths=$(perl ${pathsFromGraph} ./closure-*)
 
-        # printRegistration=1 ${perl}/bin/perl ${pathsFromGraph} ./closure-* > .reginfo
         tar cfj $out \
           --owner=0 --group=0 --mode=u+rw,uga+r \
           --hard-dereference \
@@ -27,6 +27,7 @@ rec {
       '';
     };
 
+  # TODO: eventually should this go in nixpkgs?
   nix-user-chroot = stdenv.mkDerivation {
     name = "nix-user-chroot-2b144e";
     src = fetchFromGitHub {
