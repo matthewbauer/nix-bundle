@@ -28,7 +28,7 @@ $ ./hello
 Hello, world!
 ```
 
-This is a standalone file that is completely portable! As long as you are running a Linux kernel with the same architecture that you ran the command on it will run. No external dependencies are required besides a compatible Linux kernel.
+This is a standalone file that is completely portable! As long as you are running a same architecture Linux kernel and have a shell interpreter it will run. No external dependencies are required besides a compatible Linux kernel and a shell interpreter.
 
 Some others to try:
 
