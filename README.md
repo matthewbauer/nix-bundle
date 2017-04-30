@@ -44,6 +44,14 @@ Some others to try:
 ./nix-bundle.sh emacs /bin/emacs
 ```
 
+## Self-bundling
+
+Startin with v0.1.3, you can bundle nix-bundle! To do this, just use nix-bundle normally:
+
+```sh
+NIX_PATH="nixpkgs=https://github.com/matthewbauer/nixpkgs/archive/nix-bundle.tar.gz" ./nix-bundle.sh nix-bundle /bin/nix-bundle
+```
+
 ## [Experimental] Create AppImage executables from Nix expressions
 
 "nix-bundle.sh" tends to create fairly large outputs. This is largely because nix-bundle.sh uses gzip compression and AppImage uses lzma compression. Anyway, you can create a compliant "AppImage" using the "nix2appimage.sh" script:
