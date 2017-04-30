@@ -19,12 +19,30 @@ EOF
     exit 1
 fi
 
-target="$1"
-exec="$2"
-
 nix_file=`dirname $0`/default.nix
 
-expr="with import <nixpkgs> {}; with import $nix_file {}; nix-bootstrap { target = $target; run = \"$exec\"; }"
+target="$1"
+shift
+
+extraTargets=
+if [ "$#" -gt 1 ]; then
+    while [ "$#" -gt 1 ]; do
+        extraTargets="$extraTargets $1"
+        shift
+    done
+fi
+
+exec="$1"
+shift
+
+bootstrap=nix-bootstrap
+if [ "$target" = "nix-bundle" ] || [ "$target" = "nixStable" ] || [ "$target" = "nixUnstable" ]; then
+    bootstrap=nix-bootstrap-nix
+elif ! [ -z "$extraTargets" ]; then
+    bootstrap=nix-bootstrap-path
+fi
+
+expr="with import <nixpkgs> {}; with import $nix_file {}; $bootstrap { target = $target; extraTargets = [ $extraTargets ]; run = \"$exec\"; }"
 
 out=$(nix-store --no-gc-warning -r $(nix-instantiate --no-gc-warning -E "$expr"))
 
