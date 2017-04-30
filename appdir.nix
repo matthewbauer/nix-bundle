@@ -49,7 +49,7 @@ in
         chmod a+w usr/share
         mkdir -p usr/share/metainfo
         for f in ${target}/share/appdata/*.xml; do
-          ln -s .$f usr/share/metainfo
+          ln -s ../appdata/$(basename $f) usr/share/metainfo/$(basename $f)
         done
       fi
 
