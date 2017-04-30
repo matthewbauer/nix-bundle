@@ -20,10 +20,10 @@ rec {
       buildCommand = ''
         storePaths=$(perl ${pathsFromGraph} ./closure-*)
 
-        tar cfj $out \
+        tar -cf - \
           --owner=0 --group=0 --mode=u+rw,uga+r \
           --hard-dereference \
-          $storePaths
+          $storePaths | bzip2 -z > $out
       '';
     };
 
