@@ -1,9 +1,20 @@
-{ stdenv, fetchurl, perl, pathsFromGraph }:
+{ stdenv, fetchurl, perl, pathsFromGraph, fetchFromGitHub, musl }:
 
 let
-  AppRun = fetchurl {
-    url = "https://github.com/probonopd/AppImageKit/releases/download/7/AppRun-x86_64";
-    sha256 = "1k2jlyrrbzdmxv832a5vin4nzs3rh9r9vs7a8jzrl1v5bbh16nqf";
+  AppRun = stdenv.mkDerivation {
+    name = "AppRun";
+
+    phases = [ "buildPhase" "installPhase" "fixupPhase" ];
+
+    buildPhase = ''
+      CC="${musl}/bin/musl-gcc -O2 -Wall -Wno-deprecated-declarations -Wno-unused-result -static"
+      $CC ${./AppRun.c} -o AppRun
+    '';
+
+    installPhase = ''
+      mkdir -p $out/bin
+      cp AppRun $out/bin/AppRun
+    '';
   };
 
 in
@@ -63,7 +74,6 @@ in
         fi
       fi
 
-      cp ${AppRun} AppRun
-      chmod a+x AppRun
+      cp ${AppRun}/bin/AppRun AppRun
     '';
   }
