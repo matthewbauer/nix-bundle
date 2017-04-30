@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, fuse, zlib }:
+{ stdenv, fetchurl, fuse, zlib, squashfsTools }:
 
 # This is from some binaries.
 
@@ -12,6 +12,10 @@ stdenv.mkDerivation rec {
     url = "https://github.com/probonopd/AppImageKit/releases/download/7/appimagetool-x86_64.AppImage";
     sha256 = "1irvbf0xnya16cyzpvr43jviq5ly3wl7b9753rji7d1hhxwb7b9r";
   };
+
+  buildInputs = [
+    squashfsTools
+  ];
 
   sourceRoot = "squashfs-root";
 
