@@ -15,7 +15,7 @@ rec {
   maketar = { targets }:
     stdenv.mkDerivation {
       name = "maketar";
-      buildInputs = [gnutar perl bzip2];
+      buildInputs = [ perl ];
       exportReferencesGraph = map (x: [("closure-" + baseNameOf x) x]) targets;
       buildCommand = ''
         storePaths=$(perl ${pathsFromGraph} ./closure-*)
