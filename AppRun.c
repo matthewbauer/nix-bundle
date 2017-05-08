@@ -220,8 +220,8 @@ int main(int argc, char *argv[]) {
     update_map(map_buf, "/proc/self/gid_map");
 
     // chroot to rootdir
-    if (chroot(appdir) < 0) {
-        err_exit("chroot(%s)", appdir);
+    if (chroot(rootdir) < 0) {
+        err_exit("chroot(%s)", rootdir);
     }
 
     chdir("/");
