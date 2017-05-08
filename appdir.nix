@@ -1,14 +1,14 @@
-{ stdenv, fetchurl, perl, pathsFromGraph, fetchFromGitHub, musl }:
+{ stdenv, fetchurl, perl, pathsFromGraph, fetchFromGitHub, musl, coreutils, bash }:
 
 let
-  AppRun = stdenv.mkDerivation {
+  AppRun = targets: stdenv.mkDerivation {
     name = "AppRun";
 
     phases = [ "buildPhase" "installPhase" "fixupPhase" ];
 
     buildPhase = ''
       CC="${musl}/bin/musl-gcc -O2 -Wall -Wno-deprecated-declarations -Wno-unused-result -static"
-      $CC ${./AppRun.c} -o AppRun
+      $CC ${./AppRun.c} -o AppRun -DENV_PATH='"${stdenv.lib.makeBinPath targets}"'
     '';
 
     installPhase = ''
@@ -19,9 +19,10 @@ let
 
 in
 
-  { target, name }: stdenv.mkDerivation {
+  { target, name, extraTargets ? [ coreutils bash ] }: let targets = ([ target ] ++ extraTargets);
+  in stdenv.mkDerivation {
     name = "${name}.AppDir";
-    exportReferencesGraph = map (x: [("closure-" + baseNameOf x) x]) [ target ];
+    exportReferencesGraph = map (x: [("closure-" + baseNameOf x) x]) targets;
     nativeBuildInputs = [ perl ];
     buildCommand = ''
       # TODO use symlinks to shrink output size
@@ -75,6 +76,6 @@ in
         fi
       fi
 
-      cp ${AppRun}/bin/AppRun AppRun
+      cp ${AppRun targets}/bin/AppRun AppRun
     '';
   }

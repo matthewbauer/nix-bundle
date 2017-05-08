@@ -252,8 +252,8 @@ int main(int argc, char *argv[]) {
     LOAD_ENV_VAR(XDG_SESSION_ID);
     LOAD_ENV_VAR(XDG_SEAT);
 
-    setenv("PATH", "", 1);
     setenv("HOME", "/", 1);
+    setenv("PATH", ENV_PATH, 1);
     setenv("TMPDIR", "/tmp", 1);
 
     /* Run */
