@@ -176,7 +176,9 @@ int main(int argc, char *argv[]) {
     add_path("sys", rootdir);
     add_path("run", rootdir);
     add_path("etc", rootdir);
+    add_path("home", rootdir);
 
+    // setup skeleton
     char path_buf[PATH_MAX];
     snprintf(path_buf, sizeof(path_buf), "%s/tmp", rootdir);
     mkdir(path_buf, ~0);
@@ -237,6 +239,7 @@ int main(int argc, char *argv[]) {
     SAVE_ENV_VAR(XAUTHORITY);
     SAVE_ENV_VAR(XDG_SESSION_ID);
     SAVE_ENV_VAR(XDG_SEAT);
+    SAVE_ENV_VAR(HOME);
 
     clearenv();
 
@@ -251,8 +254,8 @@ int main(int argc, char *argv[]) {
     LOAD_ENV_VAR(XAUTHORITY);
     LOAD_ENV_VAR(XDG_SESSION_ID);
     LOAD_ENV_VAR(XDG_SEAT);
+    LOAD_ENV_VAR(HOME);
 
-    setenv("HOME", "/", 1);
     setenv("PATH", ENV_PATH, 1);
     setenv("TMPDIR", "/tmp", 1);
 
