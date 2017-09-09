@@ -1,16 +1,28 @@
-{ stdenv, fetchurl, perl, pathsFromGraph }:
+{ stdenv, fetchurl, perl, pathsFromGraph, fetchFromGitHub, musl, coreutils, bash }:
 
 let
-  AppRun = fetchurl {
-    url = "https://github.com/probonopd/AppImageKit/releases/download/7/AppRun-x86_64";
-    sha256 = "1k2jlyrrbzdmxv832a5vin4nzs3rh9r9vs7a8jzrl1v5bbh16nqf";
+  AppRun = targets: stdenv.mkDerivation {
+    name = "AppRun";
+
+    phases = [ "buildPhase" "installPhase" "fixupPhase" ];
+
+    buildPhase = ''
+      CC="${musl}/bin/musl-gcc -O2 -Wall -Wno-deprecated-declarations -Wno-unused-result -static"
+      $CC ${./AppRun.c} -o AppRun -DENV_PATH='"${stdenv.lib.makeBinPath targets}"'
+    '';
+
+    installPhase = ''
+      mkdir -p $out/bin
+      cp AppRun $out/bin/AppRun
+    '';
   };
 
 in
 
-  { target, name }: stdenv.mkDerivation {
+  { target, name, extraTargets ? [ coreutils bash ] }: let targets = ([ target ] ++ extraTargets);
+  in stdenv.mkDerivation {
     name = "${name}.AppDir";
-    exportReferencesGraph = map (x: [("closure-" + baseNameOf x) x]) [ target ];
+    exportReferencesGraph = map (x: [("closure-" + baseNameOf x) x]) targets;
     nativeBuildInputs = [ perl ];
     buildCommand = ''
       # TODO use symlinks to shrink output size
@@ -38,24 +50,25 @@ in
         chmod a+w usr/share
         mkdir -p usr/share/metainfo
         for f in ${target}/share/appdata/*.xml; do
-          ln -s .$f usr/share/metainfo
+          ln -s ../appdata/$(basename $f) usr/share/metainfo/$(basename $f)
         done
       fi
 
       # .desktop
       desktop=$(find ${target}/share/applications -name "*.desktop" | head -n1)
       if ! [ -z "$desktop" ]; then
-        ln -s .$desktop
+        cp .$desktop .
       fi
+
 
       # icons
       if [ -d ${target}/share/icons ]; then
-        icon=$(find ${target}/share/icons -name "${name}.png" -or -name "*.png" | head -n1)
+        icon=$(find ${target}/share/icons -name "${name}.png" | head -n1)
         if ! [ -z "$icon" ]; then
           ln -s .$icon
           ln -s .$icon .DirIcon
         else
-          icon=$(find ${target}/share/icons -name "${name}.svg" -or -name "*.svg" | head -n1)
+          icon=$(find ${target}/share/icons -name "${name}.svg" | head -n1)
           if ! [ -z "$icon" ]; then
             ln -s .$icon
             ln -s .$icon .DirIcon
@@ -63,7 +76,6 @@ in
         fi
       fi
 
-      cp ${AppRun} AppRun
-      chmod a+x AppRun
+      cp ${AppRun targets}/bin/AppRun AppRun
     '';
   }
