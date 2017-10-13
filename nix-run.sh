@@ -1,14 +1,27 @@
 #!/bin/sh
 
+# nix-run.sh provides an easy way to run executables from Nix derivations
+# without installing them. It will try to determine how to run the application
+# based on what files are installable. Currently, macOS apps, Freedesktop apps,
+# and ordinary binaries are handled.
+
+# Usage
+
 if [ -z "$1" ]; then
     >&2 echo "Need more than one argument."
-    >&2 echo "Try: $ nix-run hello"
+    >&2 echo
+    >&2 echo "Try:"
+    >&2 echo "$ nix-run hello"
+    >&2 echo
+    >&2 echo "To run the hello program"
+    >&2 echo "or substitute hello with another package in Nixpkgs"
     exit 1
 fi
 
 pkg=$1
 shift
 
+# A second argument will provide a hint to run
 if ! [ -z "$1" ]; then
     name="$1"
     shift
@@ -16,7 +29,7 @@ else
     name="$pkg"
 fi
 
-expr="with import <nixpkgs> {}; let x = $pkg; in x"
+expr="with import <nixpkgs> {}; let x = ($pkg); in x"
 path=$(nix-instantiate --no-gc-warning -E "$expr")
 out=$(nix-store --no-gc-warning -r $path)
 
@@ -25,34 +38,44 @@ if [ -z "$out" ]; then
     exit 1
 fi
 
-run_darwin_app() {
-    app="$1"
+# Run DIR as a Darwin application
+run_darwin_app () {
+    dir="$1"
     shift
-    echo 'darwin'
-    open -a "$app" --args $@
+
+    open -a "$dir" --args $@
 }
 
-run_linux_desktop_app() {
-    # taken from:
-    # https://askubuntu.com/questions/5172/running-a-desktop-file-in-the-terminal/5174#5174
-
-    desktop="$1"
+# Run FILE as a Freedesktop application
+# taken from:
+# https://askubuntu.com/questions/5172/running-a-desktop-file-in-the-terminal/5174
+run_linux_desktop_app () {
+    file="$1"
     shift
-    cmd=$(grep '^Exec' $desktop | tail -1 | \
+
+    cmd=$(grep '^Exec' $file | tail -1 | \
               sed 's/Exec=//;s/^"//;s/" *$/')
+
     if ! [ -z "$@" ]; then
         cmd=$(echo "$cmd" | sed "s/%[fu]/$1/;s/%[FU]/$@/")
     fi
+
     cmd=$(echo "$cmd" | sed "s/%k/$desktop/;s/%.//")
 }
 
+# Run FILE as an ordinary binary
 run_bin () {
-    bin="$1"
+    file="$1"
     shift
-    $bin $@
+
+    $file $@
 }
 
-if [ "$(uname)" = Darwin ] && [ -d "$out/Applications/$name.app" ]; then
+if [ -x "$out/nix-support/run" ]; then
+    run_bin "$out/nix-support/run" $@
+elif [ -x "$out/bin/run" ]; then
+    run_bin "$out/bin/run" $@
+elif [ "$(uname)" = Darwin ] && [ -d "$out/Applications/$name.app" ]; then
     run_darwin_app "$out/Applications/$name.app" $@
 elif [ "$(uname)" = Darwin ] && [ -d $out/Applications/*.app ]; then
     for f in $out/Applications/*.app; do
