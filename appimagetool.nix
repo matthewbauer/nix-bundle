@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, fuse, zlib, squashfsTools }:
+{ stdenv, fetchurl, fuse, zlib, squashfsTools, glib }:
 
 # This is from some binaries.
 
@@ -31,7 +31,15 @@ stdenv.mkDerivation rec {
   installPhase = ''
     mkdir -p $out
     cp -r usr/* $out
+
+    patchelf --set-interpreter $(cat $NIX_CC/nix-support/dynamic-linker) \
+         --set-rpath ${stdenv.glibc.out}/lib:${fuse}/lib:${zlib}/lib:${glib}/lib \
+	 $out/bin/appimagetool
+    patchelf --set-interpreter $(cat $NIX_CC/nix-support/dynamic-linker) \
+         --set-rpath ${zlib}/lib \
+	 $out/bin/mksquashfs
   '';
 
+  dontStrip = true;
   dontPatchELF = true;
 }
