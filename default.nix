@@ -33,8 +33,8 @@ rec {
     src = fetchFromGitHub {
       owner = "matthewbauer";
       repo = "nix-user-chroot";
-      rev = "b0c8f81f85487b0f9eb8ed8e6d33445423bfb3e4";
-      sha256 = "1x15jxdx9kka1nx3nmz6xkjfyb9mj3i02bhwy0zhj8z2hi1kyc9l";
+      rev = "eb8ebc5e03d397d6c167e86b552b816d3a29b170";
+      sha256 = "1d5mb02588n4zsfgk6161b53rv4972d0g5gmh7jdffwsgma7lzgh";
     };
 
     # hack to use when /nix/store is not available
