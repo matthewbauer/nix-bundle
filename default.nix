@@ -29,12 +29,12 @@ rec {
 
   # TODO: eventually should this go in nixpkgs?
   nix-user-chroot = stdenv.lib.makeOverridable stdenv.mkDerivation {
-    name = "nix-user-chroot-2b144e";
+    name = "nix-user-chroot-2c52b5f";
     src = fetchFromGitHub {
       owner = "matthewbauer";
       repo = "nix-user-chroot";
-      rev = "eb8ebc5e03d397d6c167e86b552b816d3a29b170";
-      sha256 = "1d5mb02588n4zsfgk6161b53rv4972d0g5gmh7jdffwsgma7lzgh";
+      rev = "2c52b5f3174e382c2bfdd9e61f3e4a1200077b93";
+      sha256 = "139ixrg5ihrgsmi2nl1ws3xmi0vqwl5nwfijrggg02wlbiqvdiwq";
     };
 
     # hack to use when /nix/store is not available
