@@ -30,12 +30,7 @@ rec {
   # TODO: eventually should this go in nixpkgs?
   nix-user-chroot = stdenv.lib.makeOverridable stdenv.mkDerivation {
     name = "nix-user-chroot-2c52b5f";
-    src = fetchFromGitHub {
-      owner = "matthewbauer";
-      repo = "nix-user-chroot";
-      rev = "2c52b5f3174e382c2bfdd9e61f3e4a1200077b93";
-      sha256 = "139ixrg5ihrgsmi2nl1ws3xmi0vqwl5nwfijrggg02wlbiqvdiwq";
-    };
+    src = ./nix-user-chroot;
 
     # hack to use when /nix/store is not available
     postFixup = ''
@@ -64,10 +59,18 @@ rec {
       };
     };
 
-  nix-bootstrap = { target, extraTargets ? [], run, nix-user-chroot' ? nix-user-chroot }:
-    makebootstrap {
-      startup = ''.${nix-user-chroot'}/bin/nix-user-chroot ./nix ${target}${run} \$@'';
-      targets = [ nix-user-chroot' target ] ++ extraTargets;
+  makeStartup = { target, nixUserChrootFlags, nix-user-chroot', run }:
+  writeScript "startup" ''
+  #!/bin/sh
+  .${nix-user-chroot'}/bin/nix-user-chroot -n ./nix ${nixUserChrootFlags} -- ${target}${run} $@
+  '';
+
+  nix-bootstrap = { target, extraTargets ? [], run, nix-user-chroot' ? nix-user-chroot, nixUserChrootFlags ? "" }:
+    let
+      script = makeStartup { inherit target nixUserChrootFlags nix-user-chroot' run; };
+    in makebootstrap {
+      startup = ".${script}";
+      targets = [ "${script}" ] ++ extraTargets;
     };
 
   # special case handling because of impurities in nix bootstrap
