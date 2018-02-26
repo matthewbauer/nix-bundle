@@ -11,8 +11,8 @@ in stdenv.mkDerivation rec {
   name = "appimagekit";
 
   src = fetchurl {
-    url = "https://github.com/probonopd/AppImageKit/releases/download/7/appimagetool-x86_64.AppImage";
-    sha256 = "1irvbf0xnya16cyzpvr43jviq5ly3wl7b9753rji7d1hhxwb7b9r";
+    url = "https://github.com/AppImage/AppImageKit/releases/download/10/appimagetool-x86_64.AppImage";
+    sha256 = "03zbiblj8a1yk1xsb5snxi4ckwn3diyldg1jh5hdjjhsmpw652ig";
   };
 
   buildInputs = [
