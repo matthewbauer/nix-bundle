@@ -5,7 +5,9 @@
 # Ideally, this should be source based,
 # but I can't get it to build from GitHub
 
-stdenv.mkDerivation rec {
+let
+  inherit (stdenv.cc.bintools) dynamicLinker;
+in stdenv.mkDerivation rec {
   name = "appimagekit";
 
   src = fetchurl {
@@ -22,7 +24,7 @@ stdenv.mkDerivation rec {
   unpackPhase = ''
     cp $src appimagetool-x86_64.AppImage
     chmod u+wx appimagetool-x86_64.AppImage
-    patchelf --set-interpreter $(cat $NIX_CC/nix-support/dynamic-linker) \
+    patchelf --set-interpreter ${dynamicLinker} \
              --set-rpath ${fuse}/lib:${zlib}/lib \
              appimagetool-x86_64.AppImage
     ./appimagetool-x86_64.AppImage --appimage-extract
@@ -32,10 +34,10 @@ stdenv.mkDerivation rec {
     mkdir -p $out
     cp -r usr/* $out
 
-    patchelf --set-interpreter $(cat $NIX_CC/nix-support/dynamic-linker) \
+    patchelf --set-interpreter ${dynamicLinker} \
          --set-rpath ${stdenv.glibc.out}/lib:${fuse}/lib:${zlib}/lib:${glib}/lib \
 	 $out/bin/appimagetool
-    patchelf --set-interpreter $(cat $NIX_CC/nix-support/dynamic-linker) \
+    patchelf --set-interpreter ${dynamicLinker} \
          --set-rpath ${zlib}/lib \
 	 $out/bin/mksquashfs
   '';
