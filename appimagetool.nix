@@ -34,12 +34,12 @@ in stdenv.mkDerivation rec {
     mkdir -p $out
     cp -r usr/* $out
 
-    patchelf --set-interpreter ${dynamicLinker} \
-         --set-rpath ${stdenv.glibc.out}/lib:${fuse}/lib:${zlib}/lib:${glib}/lib \
-	 $out/bin/appimagetool
-    patchelf --set-interpreter ${dynamicLinker} \
-         --set-rpath ${zlib}/lib \
-	 $out/bin/mksquashfs
+    for x in $out/bin/*; do
+      patchelf \
+        --set-interpreter ${dynamicLinker} \
+        --set-rpath ${stdenv.lib.makeLibraryPath [ zlib stdenv.glibc.out fuse glib ]} \
+        $x
+    done
   '';
 
   dontStrip = true;
