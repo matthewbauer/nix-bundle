@@ -1,5 +1,5 @@
 PREFIX ?= /usr
 
-install: nix-bundle.sh nix-run.sh appdir.nix appimagetool.nix appimage.nix AppRun.c appimage-top.nix default.nix appdir.sh nix2appimage.sh
+install: nix-bundle.sh nix-run.sh appdir.nix appimagetool.nix appimage.nix AppRun.c appimage-top.nix default.nix appdir.sh nix2appimage.sh nix-user-chroot/
 	mkdir -p ${PREFIX}/share/nix-bundle/
-	install $^ ${PREFIX}/share/nix-bundle/
+	cp -r $^ ${PREFIX}/share/nix-bundle/
