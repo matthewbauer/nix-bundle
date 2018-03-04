@@ -92,7 +92,7 @@ static void add_path(const char* name, const char* rootdir) {
 }
 
 #define SAVE_ENV_VAR(x) char *x = getenv(#x)
-#define LOAD_ENV_VAR(x) setenv(#x, x, 1)
+#define LOAD_ENV_VAR(x) do { if (x != NULL) setenv(#x, x, 1); } while(0)
 
 int main(int argc, char *argv[]) {
     char *appdir = dirname(realpath("/proc/self/exe", NULL));

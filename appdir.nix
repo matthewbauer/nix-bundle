@@ -1,13 +1,13 @@
-{ stdenv, fetchurl, perl, pathsFromGraph, fetchFromGitHub, musl, coreutils, bash }:
+{ stdenv, fetchurl, muslPkgs, perl, pathsFromGraph, fetchFromGitHub, coreutils, bash }:
 
 let
-  AppRun = targets: stdenv.mkDerivation {
+  AppRun = targets: muslPkgs.stdenv.mkDerivation {
     name = "AppRun";
 
     phases = [ "buildPhase" "installPhase" "fixupPhase" ];
 
     buildPhase = ''
-      CC="${musl}/bin/musl-gcc -O2 -Wall -Wno-deprecated-declarations -Wno-unused-result -static"
+      CC="$CC -O2 -Wall -Wno-deprecated-declarations -Wno-unused-result -static"
       $CC ${./AppRun.c} -o AppRun -DENV_PATH='"${stdenv.lib.makeBinPath targets}"'
     '';
 

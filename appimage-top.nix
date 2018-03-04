@@ -1,13 +1,17 @@
-{nixpkgs ? import <nixpkgs> {}}:
+{ nixpkgs' ? <nixpkgs> }:
 
-with nixpkgs;
+let
+  pkgs = import nixpkgs' { };
+  muslPkgs = import nixpkgs' {
+    localSystem.config = "x86_64-unknown-linux-musl";
+  };
 
-rec {
-  appimagetool = callPackage ./appimagetool.nix {};
+in rec {
+  appimagetool = pkgs.callPackage ./appimagetool.nix {};
 
-  appimage = callPackage ./appimage.nix {
+  appimage = pkgs.callPackage ./appimage.nix {
     inherit appimagetool;
   };
 
-  appdir = callPackage ./appdir.nix {};
+  appdir = pkgs.callPackage ./appdir.nix { inherit muslPkgs; };
 }
