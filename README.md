@@ -8,7 +8,6 @@ nix-bundle is a way to package Nix attributes into single-file executables.
 * Can be run by non-root users
 * No runtime
 * Distro agnostic
-* Completely portable
 * No installation
 
 ## Getting started
@@ -28,7 +27,7 @@ $ ./hello
 Hello, world!
 ```
 
-This is a standalone file that is completely portable! As long as you are running a same architecture Linux kernel and have a shell interpreter it will run. No external dependencies are required besides a compatible Linux kernel and a shell interpreter.
+This is a standalone file that is completely portable! As long as you are running the same architecture Linux kernel and have a shell interpreter available it will run.
 
 Some others to try:
 
@@ -44,9 +43,9 @@ Some others to try:
 ./nix-bundle.sh emacs /bin/emacs
 ```
 
-## Self-bundling
+## Self-bundling (meta)
 
-Startin with v0.1.3, you can bundle nix-bundle! To do this, just use nix-bundle normally:
+Starting with v0.1.3, you can bundle nix-bundle! To do this, just use nix-bundle normally:
 
 ```sh
 NIX_PATH="nixpkgs=https://github.com/matthewbauer/nixpkgs/archive/nix-bundle.tar.gz" ./nix-bundle.sh nix-bundle /bin/nix-bundle
@@ -54,7 +53,7 @@ NIX_PATH="nixpkgs=https://github.com/matthewbauer/nixpkgs/archive/nix-bundle.tar
 
 ## [Experimental] Create AppImage executables from Nix expressions
 
-"nix-bundle.sh" tends to create fairly large outputs. This is largely because nix-bundle.sh uses gzip compression and AppImage uses lzma compression. Anyway, you can create a compliant "AppImage" using the "nix2appimage.sh" script:
+"nix-bundle.sh" tends to create fairly large outputs. This is largely because nix-bundle.sh "extracts" its payload up front. AppImage uses a different method where extraction only takes place when the file is accessed (through FUSE and SquashFS). You can now create a compliant "AppImage" using the "nix2appimage.sh" script:
 
 ```sh
 ./nix2appimage.sh emacs
@@ -83,6 +82,8 @@ Some other examples to try:
 ```
 
 These may take a while because of the large closure size.
+
+Note that these do not currently work out of the box with NixOS. Other Linux distros should work.
 
 ## Comparison with AppImage, FlatPak, Snappy
 
