@@ -61,15 +61,14 @@ rec {
 
   makeStartup = { target, nixUserChrootFlags, nix-user-chroot', run }:
   writeScript "startup" ''
-  #!/bin/sh
-  .${nix-user-chroot'}/bin/nix-user-chroot -n ./nix ${nixUserChrootFlags} -- ${target}${run} $@
+.${nix-user-chroot'}/bin/nix-user-chroot -n ./nix ${nixUserChrootFlags} -- ${target}${run} $@
   '';
 
   nix-bootstrap = { target, extraTargets ? [], run, nix-user-chroot' ? nix-user-chroot, nixUserChrootFlags ? "" }:
     let
       script = makeStartup { inherit target nixUserChrootFlags nix-user-chroot' run; };
     in makebootstrap {
-      startup = ".${script}";
+      startup = ".${script} '\"$@\"'";
       targets = [ "${script}" ] ++ extraTargets;
     };
 
