@@ -181,44 +181,40 @@ int main(int argc, char *argv[]) {
     add_path(m.src, m.dest, rootdir);
   }
 
-    char path_buf[PATH_MAX];
-    snprintf(path_buf, sizeof(path_buf), "%s/tmp", rootdir);
-    mkdir(path_buf, ~0);
-    snprintf(path_buf, sizeof(path_buf), "%s/var", rootdir);
+  // make sure nixdir exists
+  struct stat statbuf2;
+  if (stat(nixdir, &statbuf2) < 0) {
+    err_exit("stat(%s)", nixdir);
+  }
 
-    // make sure nixdir exists
-    struct stat statbuf2;
-    if (stat(nixdir, &statbuf2) < 0) {
-        err_exit("stat(%s)", nixdir);
-    }
+  char path_buf[PATH_MAX];
+  // mount /nix to new namespace
+  snprintf(path_buf, sizeof(path_buf), "%s/nix", rootdir);
+  mkdir(path_buf, statbuf2.st_mode & ~S_IFMT);
+  if (mount(nixdir, path_buf, "none", MS_BIND | MS_REC, NULL) < 0) {
+    err_exit("mount(%s, %s)", nixdir, path_buf);
+  }
 
-    // mount /nix to new namespace
-    snprintf(path_buf, sizeof(path_buf), "%s/nix", rootdir);
-    mkdir(path_buf, statbuf2.st_mode & ~S_IFMT);
-    if (mount(nixdir, path_buf, "none", MS_BIND | MS_REC, NULL) < 0) {
-        err_exit("mount(%s, %s)", nixdir, path_buf);
-    }
+  // fixes issue #1 where writing to /proc/self/gid_map fails
+  // see user_namespaces(7) for more documentation
+  int fd_setgroups = open("/proc/self/setgroups", O_WRONLY);
+  if (fd_setgroups > 0) {
+    write(fd_setgroups, "deny", 4);
+  }
 
-    // fixes issue #1 where writing to /proc/self/gid_map fails
-    // see user_namespaces(7) for more documentation
-    int fd_setgroups = open("/proc/self/setgroups", O_WRONLY);
-    if (fd_setgroups > 0) {
-        write(fd_setgroups, "deny", 4);
-    }
+  // map the original uid/gid in the new ns
+  char map_buf[1024];
+  snprintf(map_buf, sizeof(map_buf), "%d %d 1", uid, uid);
+  update_map(map_buf, "/proc/self/uid_map");
+  snprintf(map_buf, sizeof(map_buf), "%d %d 1", gid, gid);
+  update_map(map_buf, "/proc/self/gid_map");
 
-    // map the original uid/gid in the new ns
-    char map_buf[1024];
-    snprintf(map_buf, sizeof(map_buf), "%d %d 1", uid, uid);
-    update_map(map_buf, "/proc/self/uid_map");
-    snprintf(map_buf, sizeof(map_buf), "%d %d 1", gid, gid);
-    update_map(map_buf, "/proc/self/gid_map");
+  // chroot to rootdir
+  if (chroot(rootdir) < 0) {
+    err_exit("chroot(%s)", rootdir);
+  }
 
-    // chroot to rootdir
-    if (chroot(rootdir) < 0) {
-        err_exit("chroot(%s)", rootdir);
-    }
-
-    chdir("/");
+  chdir("/");
 
   if (clear_env) clearenv();
   setenv("NIX_PATH", NIX_PATH, 1);
@@ -226,7 +222,7 @@ int main(int argc, char *argv[]) {
   setenv("PATH", ENV_PATH, 1);
 
   for (list<struct SetEnv>::iterator it = envMappings.begin();
-      it != envMappings.end(); ++it) {
+       it != envMappings.end(); ++it) {
     struct SetEnv e = *it;
     setenv(e.key.c_str(), e.value.c_str(), 1);
   }
