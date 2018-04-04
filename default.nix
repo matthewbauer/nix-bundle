@@ -32,6 +32,8 @@ rec {
     name = "nix-user-chroot-2c52b5f";
     src = ./nix-user-chroot;
 
+    makeFlags = [];
+
     # hack to use when /nix/store is not available
     postFixup = ''
       exe=$out/bin/nix-user-chroot
@@ -72,26 +74,20 @@ rec {
       targets = [ "${script}" ] ++ extraTargets;
     };
 
-  # special case handling because of impurities in nix bootstrap
-  # anything that needs Nix will have to have these setup before they can be run
-  nix-bootstrap-nix = let
-    nix-user-chroot' = nix-user-chroot.override {
-      buildInputs = [ cacert gnutar bzip2 gzip coreutils ];
-      makeFlags = [
-        ''NIX_SSL_CERT_FILE="${cacert}/etc/ssl/certs/ca-bundle.crt"''
-        ''NIX_PATH="nixpkgs=https://github.com/matthewbauer/nixpkgs/archive/nix-bundle.tar.gz"''
-        ''ENV_PATH="${stdenv.lib.makeBinPath [ coreutils gnutar bzip2 gzip bash ]}"''
-      ];
-    }; in { target, extraTargets ? [], run }: nix-bootstrap { inherit target extraTargets run nix-user-chroot'; };
+  nix-bootstrap-nix = {target, run, extraTargets ? []}:
+    nix-bootstrap-path {
+      inherit target run;
+      extraTargets = [ gnutar bzip2 xz gzip coreutils bash ];
+    };
 
   # special case adding path to the environment before launch
   nix-bootstrap-path = let
-    nix-user-chroot'' = targets: nix-user-chroot.override {
-      buildInputs = targets;
-      makeFlags = [
+    nix-user-chroot'' = targets: nix-user-chroot.overrideDerivation (o: {
+      buildInputs = o.buildInputs ++ targets;
+      makeFlags = o.makeFlags ++ [
         ''ENV_PATH="${stdenv.lib.makeBinPath targets}"''
       ];
-    }; in { target, extraTargets ? [], run }: nix-bootstrap {
+    }); in { target, extraTargets ? [], run }: nix-bootstrap {
       inherit target extraTargets run;
       nix-user-chroot' = nix-user-chroot'' extraTargets;
     };

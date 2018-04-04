@@ -36,7 +36,7 @@ exec="$1"
 shift
 
 bootstrap=nix-bootstrap
-if [ "$target" = "nix-bundle" ] || [ "$target" = "nixStable" ] || [ "$target" = "nixUnstable" ]; then
+if [ "$target" = "nix-bundle" ] || [ "$target" = "nixStable" ] || [ "$target" = "nixUnstable" ] || [ "$target" = "nix" ]; then
     bootstrap=nix-bootstrap-nix
 elif ! [ -z "$extraTargets" ]; then
     bootstrap=nix-bootstrap-path

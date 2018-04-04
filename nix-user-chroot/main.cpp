@@ -219,8 +219,6 @@ int main(int argc, char *argv[]) {
   chdir("/");
 
   if (clear_env) clearenv();
-  setenv("NIX_PATH", NIX_PATH, 1);
-  setenv("NIX_SSL_CERT_FILE", NIX_SSL_CERT_FILE, 1);
   setenv("PATH", ENV_PATH, 1);
 
   for (list<struct SetEnv>::iterator it = envMappings.begin();
