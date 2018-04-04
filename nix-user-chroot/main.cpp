@@ -112,7 +112,6 @@ int main(int argc, char *argv[]) {
     switch (opt) {
     case 'c':
       clear_env = 1;
-      puts("clearing env");
       break;
     case 'n':
       // determine absolute directory for nix dir
@@ -167,7 +166,12 @@ int main(int argc, char *argv[]) {
 
   // "unshare" into new namespace
   if (unshare(CLONE_NEWNS | CLONE_NEWUSER) < 0) {
-    err_exit("unshare()");
+    if (errno == EPERM) {
+      fputs("Run the following as root to enable unprivileged namespace use:\nsysctl -w kernel.unprivileged_userns_clone=1 ; echo kernel.unprivileged_userns_clone=1 > /etc/sysctl.d/nix-user-chroot.conf\n\n", stderr);
+      exit(EXIT_FAILURE);
+    } else {
+      err_exit("unshare()");
+    }
   }
 
   // add necessary system stuff to rootdir namespace
