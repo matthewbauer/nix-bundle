@@ -202,6 +202,7 @@ int main(int argc, char *argv[]) {
   int fd_setgroups = open("/proc/self/setgroups", O_WRONLY);
   if (fd_setgroups > 0) {
     write(fd_setgroups, "deny", 4);
+    close(fd_setgroups);
   }
 
   // map the original uid/gid in the new ns
