@@ -1,4 +1,4 @@
-{nixpkgs ? import <nixpkgs> {}}:
+{nixpkgs ? import ./top.nix}:
 
 with nixpkgs;
 
@@ -7,7 +7,7 @@ rec {
     stdenv.mkDerivation {
       name = "arx";
       buildCommand = ''
-        ${haskellPackages.arx}/bin/arx tmpx ${archive} -o $out // ${startup}
+        ${(import <nixpkgs> {}).haskellPackages.arx}/bin/arx tmpx -rm! ${archive} -o $out // ${startup}
         chmod +x $out
       '';
     };
@@ -38,7 +38,7 @@ rec {
     postFixup = ''
       exe=$out/bin/nix-user-chroot
       patchelf \
-        --set-interpreter .$(patchelf --print-interpreter $exe) \
+        --set-interpreter .${musl}/lib/libc.so \
         --set-rpath $(patchelf --print-rpath $exe | sed 's|/nix/store/|./nix/store/|g') \
         $exe
     '';
@@ -72,12 +72,6 @@ rec {
     in makebootstrap {
       startup = ".${script} '\"$@\"'";
       targets = [ "${script}" ] ++ extraTargets;
-    };
-
-  nix-bootstrap-nix = {target, run, extraTargets ? []}:
-    nix-bootstrap-path {
-      inherit target run;
-      extraTargets = [ gnutar bzip2 xz gzip coreutils bash ];
     };
 
   # special case adding path to the environment before launch
