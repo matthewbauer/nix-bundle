@@ -1,4 +1,4 @@
-{nixpkgs ? import <nixpkgs> {}}:
+{nixpkgs ? import ./top.nix}:
 
 with nixpkgs;
 
