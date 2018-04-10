@@ -2,12 +2,19 @@
 
 with nixpkgs;
 
-rec {
+let
+  arx' = haskellPackages.arx.overrideAttrs (o: {
+    patchPhase = (o.patchPhase or "") + ''
+      substituteInPlace model-scripts/tmpx.sh \
+        --replace "/tmp/" ' ''${XDG_CACHE_HOME:-"$HOME/.cache"}/'
+    '';
+  });
+in rec {
   arx = { archive, startup}:
     stdenv.mkDerivation {
       name = "arx";
       buildCommand = ''
-        ${haskellPackages.arx}/bin/arx tmpx ${archive} -o $out // ${startup}
+        ${arx'}/bin/arx tmpx --shared -rm! ${archive} -o $out // ${startup}
         chmod +x $out
       '';
     };
