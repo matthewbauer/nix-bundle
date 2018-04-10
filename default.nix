@@ -38,7 +38,7 @@ rec {
     postFixup = ''
       exe=$out/bin/nix-user-chroot
       patchelf \
-        --set-interpreter .$(patchelf --print-interpreter $exe) \
+        --set-interpreter .${musl}/lib/libc.so \
         --set-rpath $(patchelf --print-rpath $exe | sed 's|/nix/store/|./nix/store/|g') \
         $exe
     '';
