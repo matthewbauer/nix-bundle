@@ -107,6 +107,7 @@ int main(int argc, char *argv[]) {
   x("var");
   x("etc");
   x("usr");
+  x("home");
 #undef x
 
   int opt;
