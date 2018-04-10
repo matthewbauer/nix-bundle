@@ -7,7 +7,7 @@ rec {
     stdenv.mkDerivation {
       name = "arx";
       buildCommand = ''
-        ${haskellPackages.arx}/bin/arx tmpx ${archive} -o $out // ${startup}
+        ${(import <nixpkgs> {}).haskellPackages.arx}/bin/arx tmpx ${archive} -o $out // ${startup}
         chmod +x $out
       '';
     };

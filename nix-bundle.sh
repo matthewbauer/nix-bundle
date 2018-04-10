@@ -42,8 +42,9 @@ elif ! [ -z "$extraTargets" ]; then
     bootstrap=nix-bootstrap-path
 fi
 
-expr="with import ./top.nix; with import $nix_file {}; $bootstrap { target = $target; extraTargets = [ $extraTargets ]; run = \"$exec\"; }"
+expr="with import ./top.nix; with import $nix_file {}; $bootstrap { target = ($target); extraTargets = [ $extraTargets ]; run = \"$exec\"; }"
 
+echo "$expr"
 out=$(nix-store --no-gc-warning -r $(nix-instantiate --no-gc-warning -E "$expr"))
 
 if [ -z "$out" ]; then
