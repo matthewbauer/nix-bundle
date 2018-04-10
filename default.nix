@@ -74,12 +74,6 @@ rec {
       targets = [ "${script}" ] ++ extraTargets;
     };
 
-  nix-bootstrap-nix = {target, run, extraTargets ? []}:
-    nix-bootstrap-path {
-      inherit target run;
-      extraTargets = [ gnutar bzip2 xz gzip coreutils bash ];
-    };
-
   # special case adding path to the environment before launch
   nix-bootstrap-path = let
     nix-user-chroot'' = targets: nix-user-chroot.overrideDerivation (o: {
