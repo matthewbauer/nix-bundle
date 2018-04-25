@@ -6,7 +6,7 @@ let
   arx' = haskellPackages.arx.overrideAttrs (o: {
     patchPhase = (o.patchPhase or "") + ''
       substituteInPlace model-scripts/tmpx.sh \
-        --replace "/tmp/" ' ''${XDG_CACHE_HOME:-"$HOME/.cache"}/'
+        --replace /tmp/ \$HOME/.cache/
     '';
   });
 in rec {
