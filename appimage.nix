@@ -5,7 +5,9 @@ stdenv.mkDerivation {
   name = "appimage";
   buildInputs = [ appimagetool ];
   buildCommand = ''
-    ARCH=x86_64 appimagetool ${dir}/*.AppDir
+    cp -r ${dir}/* .
+    chmod +w *.AppDir
+    ARCH=x86_64 appimagetool *.AppDir
     mkdir $out
     cp *.AppImage $out
   '';
