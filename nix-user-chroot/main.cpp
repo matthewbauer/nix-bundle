@@ -26,6 +26,10 @@
 using namespace std;
 
 #define err_exit(format, ...) { fprintf(stderr, format ": %s\n", ##__VA_ARGS__, strerror(errno)); exit(EXIT_FAILURE); }
+static int child_proc(const char *rootdir, const char *nixdir, uint8_t clear_env, list<struct DirMapping> dirMappings, list<struct SetEnv> envMappings, const char *executable, char * const new_argv[]);
+
+volatile uint8_t child_died = 0;
+int child_pid = 0;
 
 static void usage(const char *pname) {
     fprintf(stderr, "Usage: %s -n <nixpath> -- <command>\n", pname);
@@ -33,6 +37,7 @@ static void usage(const char *pname) {
     fprintf(stderr, "\t-m <src>:<src>\tmap src on the host to dest in the sandbox\n");
     fprintf(stderr, "\t-d\tdelete all default dir mappings, may break things\n");
     fprintf(stderr, "\t-p <var>\tpreserve the value of a variable across the -c clear\n");
+    fprintf(stderr, "\t-e\tadd an /escape-hatch to the sandbox, and run (outside the sandbox) any strings written to it\n");
 
     exit(EXIT_FAILURE);
 }
@@ -91,8 +96,15 @@ struct DirMapping parseMapping(string input) {
   return (struct DirMapping){ src, dest };
 }
 
+static void handle_child_death(int signo, siginfo_t *info, void *context) {
+  if ( (child_pid == 0) || (info->si_pid == child_pid) ) {
+    child_died = 1;
+  }
+}
+
 int main(int argc, char *argv[]) {
   uint8_t clear_env = 0;
+  uint8_t enable_escape_hatch = 0;
   char *nixdir = NULL;
   list<struct DirMapping> dirMappings;
   list<struct SetEnv> envMappings;
@@ -111,10 +123,13 @@ int main(int argc, char *argv[]) {
 #undef x
 
   int opt;
-  while ((opt = getopt(argc, argv, "cn:m:dp:")) != -1) {
+  while ((opt = getopt(argc, argv, "cen:m:dp:")) != -1) {
     switch (opt) {
     case 'c':
       clear_env = 1;
+      break;
+    case 'e':
+      enable_escape_hatch = 1;
       break;
     case 'n':
       // determine absolute directory for nix dir
@@ -163,6 +178,62 @@ int main(int argc, char *argv[]) {
     err_exit("mkdtemp(%s)", template_);
   }
 
+  int unrace[2];
+
+  if (pipe(unrace)) {
+    err_exit("pipe()");
+  }
+
+  struct sigaction handle_child;
+  handle_child.sa_sigaction = handle_child_death;
+  handle_child.sa_flags = SA_SIGINFO;
+
+  struct sigaction old_handler;
+  if (sigaction(SIGCHLD, &handle_child, &old_handler)) {
+    err_exit("sigaction()");
+  }
+
+  int child;
+  child = child_pid = fork();
+  if (child < 0) {
+    err_exit("fork()");
+  } else if (child == 0) {
+    sigaction(SIGCHLD, &old_handler, NULL);
+    close(unrace[1]);
+    char buf[10];
+    read(unrace[0], buf, 10);
+    close(unrace[0]);
+    return child_proc(rootdir, nixdir, clear_env, dirMappings, envMappings, argv[optind], argv + optind);
+  } else {
+    close(unrace[0]);
+    char fifopath[PATH_MAX];
+    if (enable_escape_hatch) {
+      snprintf(fifopath, PATH_MAX, "%s/escape-hatch", rootdir);
+      mkfifo(fifopath, 0600);
+    }
+    close(unrace[1]);
+    if (enable_escape_hatch) {
+      char buffer[1024];
+      while (!child_died) {
+        int fd = open(fifopath, O_RDONLY);
+        if (fd < 0) {
+          if (errno == EINTR) continue;
+          fprintf(stderr, "error opening escape-hatch: %s\n", strerror(errno));
+          continue;
+        }
+        int size = read(fd, buffer, 1024);
+        buffer[size] = 0;
+        system(buffer);
+        close(fd);
+      }
+    }
+    int status;
+    int ret = waitpid(child, &status, 0);
+    return WEXITSTATUS(status);
+  }
+}
+
+static int child_proc(const char *rootdir, const char *nixdir, uint8_t clear_env, list<struct DirMapping> dirMappings, list<struct SetEnv> envMappings, const char *executable, char * const new_argv[]) {
   // get uid, gid before going to new namespace
   uid_t uid = getuid();
   gid_t gid = getgid();
@@ -170,7 +241,7 @@ int main(int argc, char *argv[]) {
   // "unshare" into new namespace
   if (unshare(CLONE_NEWNS | CLONE_NEWUSER) < 0) {
     if (errno == EPERM) {
-      fputs("Run the following as root to enable unprivileged namespace use:\nsysctl -w kernel.unprivileged_userns_clone=1 ; echo kernel.unprivileged_userns_clone=1 > /etc/sysctl.d/nix-user-chroot.conf\n\n", stderr);
+      fputs("Run the following to enable unprivileged namespace use:\nsudo bash -c \"sysctl -w kernel.unprivileged_userns_clone=1 ; echo kernel.unprivileged_userns_clone=1 > /etc/sysctl.d/nix-user-chroot.conf\"\n\n", stderr);
       exit(EXIT_FAILURE);
     } else {
       err_exit("unshare()");
@@ -230,6 +301,6 @@ int main(int argc, char *argv[]) {
   }
 
   // execute the command
-  execvp(argv[optind], argv + optind);
-  err_exit("execvp(%s)", argv[optind]);
+  execvp(executable, new_argv);
+  err_exit("execvp(%s)", executable);
 }
