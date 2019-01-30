@@ -120,6 +120,7 @@ int main(int argc, char *argv[]) {
   x("etc");
   x("usr");
   x("home");
+  x("root");
 #undef x
 
   int opt;
