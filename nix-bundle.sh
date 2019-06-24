@@ -67,7 +67,8 @@ Flags:
       --argstr <NAME> <STRING>  string-valued argument to be passed to Nix functions
   -f, --file <FILE>             evaluate FILE rather than the default
   -I, --include <PATH>          add a path to the list of locations used to look up <...> file names
-      --bin <BINARY>            the binary to bundle, relative to TARGET's output path
+      --bin <BINARY>            the binary to bundle, relative to TARGET's output path; defaults to
+                                the lexicographically first file inside /bin
 
 Examples:
 
@@ -100,14 +101,6 @@ do
     shift
 done
 
-# Check if all required arguments were passed
-
-if [ -z ${bin+x} ]
-then
-    echo "error: flag '--bin' is required" >&2
-    fail
-fi
-
 # Create tmp directory for the links produced by `nix build`
 
 linkdir=$(mktemp -d)
@@ -134,6 +127,13 @@ if [ -z "$target_path" ]
 then
     nix build "${build_flags[@]}" || exit $?
     target_path="$(readlink "$linkdir/result")"
+fi
+
+# Apply default for --bin
+
+if [ -z ${bin+x} ]
+then
+    bin=$(ls "$target_path/bin" | head -1)
 fi
 
 # Determine bootstrap function -- This seems like a total hack!
