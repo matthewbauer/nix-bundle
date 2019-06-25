@@ -110,7 +110,7 @@ build_flags+=("$linkdir/result")
 # Build targets
 
 target_path=
-extra_target_paths=
+extra_target_paths=()
 
 for target in "${targets[@]}"
 do
@@ -120,7 +120,7 @@ do
     then
         target_path="$(readlink "$out_link")"
     else
-        extra_target_paths="$extra_target_paths $(readlink "$out_link")"
+        extra_target_paths+=("\"$(readlink "$out_link")\"")
     fi
     rm "$out_link"
 done
@@ -150,7 +150,7 @@ fi
 
 # Run bootstrap function
 
-expr="(with import $nix_file {}; $bootstrap { target = $target_path; extraTargets = [$extra_target_paths ]; run = \"$bin\"; })"
+expr="(with import $nix_file {}; $bootstrap { target = \"$target_path\"; extraTargets = [ ${extra_target_paths[@]} ]; run = \"$bin\"; })"
 
 echo $expr
 
