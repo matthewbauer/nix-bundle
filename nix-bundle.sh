@@ -115,18 +115,21 @@ extra_target_paths=
 for target in "${targets[@]}"
 do
     nix build "${build_flags[@]}" "$target" || exit $?
+    out_link="$linkdir/$(ls "$linkdir")"
     if [ -z "$target_path" ]
     then
-        target_path="$(readlink "$linkdir/result")"
+        target_path="$(readlink "$out_link")"
     else
-        extra_target_paths="$extra_target_paths $(readlink "$linkdir/result")"
+        extra_target_paths="$extra_target_paths $(readlink "$out_link")"
     fi
+    rm "$out_link"
 done
 
 if [ -z "$target_path" ]
 then
     nix build "${build_flags[@]}" || exit $?
-    target_path="$(readlink "$linkdir/result")"
+    out_link="$(ls "$linkdir")"
+    target_path="$(readlink "$out_link")"
 fi
 
 # Apply default for --bin
