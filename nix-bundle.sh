@@ -101,6 +101,18 @@ do
     shift
 done
 
+# Add application-specific extra targets
+
+if [ "${targets[0]}" = "nix-bundle" ] || [ "${targets[0]}" = "nixStable" ] || [ "${targets[0]}" = "nixUnstable" ] || [ "${targets[0]}" = "nix" ]
+then
+    targets+=("bash")
+    targets+=("bzip2")
+    targets+=("coreutils")
+    targets+=("gnutar")
+    targets+=("gzip")
+    targets+=("xz")
+fi
+
 # Create tmp directory for the links produced by `nix build`
 
 linkdir=$(mktemp -d)
@@ -142,9 +154,7 @@ fi
 # Determine bootstrap function -- This seems like a total hack!
 
 bootstrap=nix-bootstrap
-if [ "${targets[0]}" = "nix-bundle" ] || [ "${targets[0]}" = "nixStable" ] || [ "${targets[0]}" = "nixUnstable" ] || [ "${targets[0]}" = "nix" ]; then
-    bootstrap=nix-bootstrap-nix
-elif ! [ -z "$extra_target_paths" ]; then
+if ! [ -z "$extra_target_paths" ]; then
     bootstrap=nix-bootstrap-path
 fi
 
