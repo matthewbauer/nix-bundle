@@ -42,7 +42,7 @@ in
       cd $out/${name}.AppDir
 
       mkdir -p nix/store
-      cp -Lr $storePaths nix/store
+      cp -r $storePaths nix/store
 
       ln -s .${target} usr
 
