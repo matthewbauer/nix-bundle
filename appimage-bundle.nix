@@ -18,26 +18,17 @@ let
       src = env;
       inherit exec;
       buildInputs = [ drv ];
-      usr_fonts = buildEnv {
-        name = "fonts";
-        paths = [noto-fonts];
-      };
       buildCommand = ''
-        source $stdenv/setup
-        mkdir $out
+        mkdir -p $out/share/icons/hicolor/256x256/apps
+        mkdir -p $out/share/applications
+
         shopt -s extglob
         ln -s ${env}/!(share) $out/
-        mkdir -p $out/share/fonts
         ln -s ${env}/share/* $out/share/
 
-        cp ${usr_fonts}/share/fonts/* $out/share/fonts -R
-
-        mkdir -p $out/share/icons
-        mkdir -p $out/share/icons/hicolor/256x256/apps
         touch $out/share/icons/hicolor/256x256/apps/${drv.name}.png
         touch $out/share/icons/${drv.name}.png
 
-        mkdir -p $out/share/applications
         cat <<EOF > $out/share/applications/${drv.name}.desktop
         [Desktop Entry]
         Type=Application
