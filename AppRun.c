@@ -226,8 +226,10 @@ int main(int argc, char *argv[]) {
         err_exit("chroot(%s)", rootdir);
     }
 
-    chdir("/");
+    char *pwddir = getenv("PWD");
+    chdir(pwddir);
 
+    SAVE_ENV_VAR(PWD);
     SAVE_ENV_VAR(DBUS_SESSION_BUS_ADDRESS);
     SAVE_ENV_VAR(USER);
     SAVE_ENV_VAR(HOSTNAME);
@@ -243,6 +245,7 @@ int main(int argc, char *argv[]) {
 
     clearenv();
 
+    LOAD_ENV_VAR(PWD);
     LOAD_ENV_VAR(DBUS_SESSION_BUS_ADDRESS);
     LOAD_ENV_VAR(USER);
     LOAD_ENV_VAR(HOSTNAME);
