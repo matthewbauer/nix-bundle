@@ -36,7 +36,7 @@ Some others to try:
 ```
 
 ```sh
-./nix-bundle.sh firefox /bin/firefox
+./nix-bundle.sh firefox /bin/firefox # backup your .mozilla subDir before bundle is launched elesewhere, profile might get wrecked
 ```
 
 ```sh
