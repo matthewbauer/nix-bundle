@@ -61,6 +61,8 @@ run_linux_desktop_app () {
     fi
 
     cmd=$(echo "$cmd" | sed "s/%k/$desktop/;s/%.//")
+
+    "$cmd" "$@"
 }
 
 # Run FILE as an ordinary binary
