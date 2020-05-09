@@ -54,7 +54,7 @@ run_linux_desktop_app () {
     shift
 
     cmd=$(grep '^Exec' $file | tail -1 | \
-              sed 's/Exec=//;s/^"//;s/" *$/')
+              sed 's/Exec=//;s/^"//;s/" *$//')
 
     if ! [ -z "$@" ]; then
         cmd=$(echo "$cmd" | sed "s/%[fu]/$1/;s/%[FU]/$@/")
