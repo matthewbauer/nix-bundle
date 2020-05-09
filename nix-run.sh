@@ -18,7 +18,7 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
-pkg=$1
+pkg="$1"
 shift
 
 # A second argument will provide a hint to run
@@ -31,7 +31,7 @@ fi
 
 expr="with import <nixpkgs> {}; let x = ($pkg); in x"
 path=$(nix-instantiate --no-gc-warning -E "$expr")
-out=$(nix-store --no-gc-warning -r $path)
+out=$(nix-store --no-gc-warning -r "$path")
 
 if [ -z "$out" ]; then
     >&2 echo "Could not evaluate $pkg to a Nix drv."
@@ -43,7 +43,7 @@ run_darwin_app () {
     dir="$1"
     shift
 
-    open -a "$dir" --args $@
+    open -a "$dir" --args "$@"
 }
 
 # Run FILE as a Freedesktop application
@@ -70,18 +70,18 @@ run_bin () {
     file="$1"
     shift
 
-    $file $@
+    "$file" "$@"
 }
 
 if [ -x "$out/nix-support/run" ]; then
-    run_bin "$out/nix-support/run" $@
+    run_bin "$out/nix-support/run" "$@"
 elif [ -x "$out/bin/run" ]; then
-    run_bin "$out/bin/run" $@
+    run_bin "$out/bin/run" "$@"
 elif [ "$(uname)" = Darwin ] && [ -d "$out/Applications/$name.app" ]; then
-    run_darwin_app "$out/Applications/$name.app" $@
+    run_darwin_app "$out/Applications/$name.app" "$@"
 elif [ "$(uname)" = Darwin ] && [ -d $out/Applications/*.app ]; then
     for f in $out/Applications/*.app; do
-        run_darwin_app "$f" $@
+        run_darwin_app "$f" "$@"
     done
 elif [ -f "$out/share/applications/$name.desktop" ]; then
     run_linux_desktop_app "$out/share/applications/$name.desktop" $@
@@ -90,10 +90,10 @@ elif [ -d $out/share/applications ]; then
         run_linux_desktop_app "$f"
     done
 elif [ -x "$out/bin/$name" ]; then
-    run_bin "$out/bin/$name" $@
+    run_bin "$out/bin/$name" "$@"
 elif [ -d "$out/bin" ]; then
     for bin in $out/bin/*; do
-        run_bin "$bin" $@
+        run_bin "$bin" "$@"
     done
 else
     >&2 echo "Cannot find a way to run path $out."
