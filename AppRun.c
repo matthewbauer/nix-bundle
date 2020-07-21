@@ -207,6 +207,11 @@ int main(int argc, char *argv[]) {
         err_exit("mount(%s, %s)", usrdir, path_buf);
     }
 
+    snprintf(path_buf, sizeof(path_buf), "%s/bin", rootdir);
+    if (symlink("/usr/bin", path_buf) < 0) {
+        err_exit("symlink(/usr/bin, %s)", path_buf);
+    }
+
     // fixes issue #1 where writing to /proc/self/gid_map fails
     // see user_namespaces(7) for more documentation
     int fd_setgroups = open("/proc/self/setgroups", O_WRONLY);
