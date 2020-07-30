@@ -58,6 +58,8 @@ in rec {
 
       runHook postInstall
     '';
+
+    meta.platforms = lib.platforms.linux;
   };
 
   makebootstrap = { targets, startup }:
