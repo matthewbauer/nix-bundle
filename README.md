@@ -50,6 +50,12 @@ Or if you want to try graphical applications:
 ./nix-bundle.sh firefox /bin/firefox
 ```
 
+```sh
+# SDL-based game. ~228MB
+./nix-bundle.sh ivan /bin/ivan
+```
+
+
 ## Self-bundling (meta)
 
 Starting with v0.1.3, you can bundle nix-bundle! To do this, just use nix-bundle normally:
