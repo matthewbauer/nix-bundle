@@ -36,11 +36,18 @@ Some others to try:
 ```
 
 ```sh
-./nix-bundle.sh firefox /bin/firefox
+./nix-bundle.sh emacs /bin/emacs
+```
+
+Or if you want to try graphical applications:
+
+```sh
+# Simple X game. Very few dependencies. Quick to build and load. ~13MB
+./nix-bundle.sh xskat /bin/xskat
 ```
 
 ```sh
-./nix-bundle.sh emacs /bin/emacs
+./nix-bundle.sh firefox /bin/firefox
 ```
 
 ## Self-bundling (meta)
