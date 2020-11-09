@@ -8,6 +8,9 @@ Usage: $0 TARGET EXECUTABLE
 Create a single-file bundle from the nixpkgs attribute "TARGET".
 EXECUTABLE should be relative to the TARGET's output path.
 
+The TARGET is either an attribute in nixpkgs, or an absolute path to the
+store.
+
 For example:
 
 $ $0 hello /bin/hello
