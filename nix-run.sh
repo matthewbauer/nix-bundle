@@ -22,7 +22,7 @@ pkg="$1"
 shift
 
 # A second argument will provide a hint to run
-if ! [ -z "$1" ]; then
+if [ -n "$1" ]; then
     name="$1"
     shift
 else
@@ -53,11 +53,11 @@ run_linux_desktop_app () {
     file="$1"
     shift
 
-    cmd=$(grep '^Exec' $file | tail -1 | \
+    cmd=$(grep '^Exec' "$file" | tail -1 | \
               sed 's/Exec=//;s/^"//;s/" *$//')
 
-    if ! [ -z "$@" ]; then
-        cmd=$(echo "$cmd" | sed "s/%[fu]/$1/;s/%[FU]/$@/")
+    if [ "$#" -gt 0 ]; then
+        cmd=$(echo "$cmd" | sed "s/%[fu]/$1/;s/%[FU]/$*/")
     fi
 
     cmd=$(echo "$cmd" | sed "s/%k/$desktop/;s/%.//")
@@ -79,20 +79,20 @@ elif [ -x "$out/bin/run" ]; then
     run_bin "$out/bin/run" "$@"
 elif [ "$(uname)" = Darwin ] && [ -d "$out/Applications/$name.app" ]; then
     run_darwin_app "$out/Applications/$name.app" "$@"
-elif [ "$(uname)" = Darwin ] && [ -d $out/Applications/*.app ]; then
-    for f in $out/Applications/*.app; do
+elif [ "$(uname)" = Darwin ] && [ -d "$out"/Applications/*.app ]; then
+    for f in "$out"/Applications/*.app; do
         run_darwin_app "$f" "$@"
     done
 elif [ -f "$out/share/applications/$name.desktop" ]; then
-    run_linux_desktop_app "$out/share/applications/$name.desktop" $@
-elif [ -d $out/share/applications ]; then
-    for f in $out/share/applications/*.desktop; do
+    run_linux_desktop_app "$out/share/applications/$name.desktop" "$@"
+elif [ -d "$out"/share/applications ]; then
+    for f in "$out"/share/applications/*.desktop; do
         run_linux_desktop_app "$f"
     done
 elif [ -x "$out/bin/$name" ]; then
     run_bin "$out/bin/$name" "$@"
 elif [ -d "$out/bin" ]; then
-    for bin in $out/bin/*; do
+    for bin in "$out"/bin/*; do
         run_bin "$bin" "$@"
     done
 else

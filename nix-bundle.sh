@@ -8,6 +8,9 @@ Usage: $0 TARGET EXECUTABLE
 Create a single-file bundle from the nixpkgs attribute "TARGET".
 EXECUTABLE should be relative to the TARGET's output path.
 
+The TARGET is either an attribute in nixpkgs, or an absolute path to the
+store.
+
 For example:
 
 $ $0 hello /bin/hello
@@ -19,7 +22,7 @@ EOF
     exit 1
 fi
 
-nix_file=`dirname $0`/default.nix
+nix_file=$(dirname "$0")/default.nix
 
 target="$1"
 shift
@@ -38,21 +41,23 @@ shift
 bootstrap=nix-bootstrap
 if [ "$target" = "nix-bundle" ] || [ "$target" = "nixStable" ] || [ "$target" = "nixUnstable" ] || [ "$target" = "nix" ]; then
     bootstrap=nix-bootstrap-nix
-elif ! [ -z "$extraTargets" ]; then
+elif [ -n "$extraTargets" ]; then
     bootstrap=nix-bootstrap-path
 fi
 
 expr="with import <nixpkgs> {}; with import $nix_file {}; $bootstrap { target = $target; extraTargets = [ $extraTargets ]; run = \"$exec\"; }"
 
-out=$(nix-store --no-gc-warning -r $(nix-instantiate --no-gc-warning -E "$expr"))
+drv=$(nix-instantiate --no-gc-warning -E "$expr")
+
+out=$(nix-store --no-gc-warning --realize "$drv")
 
 if [ -z "$out" ]; then
   >&2 echo "$0 failed. Exiting."
   exit 1
 elif [ -t 1 ]; then
-  filename=$(basename $exec)
+  filename=$(basename "$exec")
   echo "Nix bundle created at $filename."
-  cp -f $out $filename
+  cp -f "$out" "$filename"
 else
-  cat $out
+  cat "$out"
 fi

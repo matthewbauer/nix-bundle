@@ -10,6 +10,16 @@ let
     '';
   });
 in rec {
+  toStorePath = target:
+    # If a store path has been given, transform it to a string. And make sure
+    # to capture the store path in its context.
+    if lib.isStorePath target then
+      let path = toString target; in
+      builtins.appendContext path { "${path}" = { path = true; }; }
+    # Otherwise, add to the store. This takes care of appending the store path
+    # in the context automatically.
+    else "${target}";
+
   arx = { archive, startup}:
     stdenv.mkDerivation {
       name = "arx";
@@ -71,9 +81,13 @@ in rec {
     };
 
   makeStartup = { target, nixUserChrootFlags, nix-user-chroot', run }:
+  let
+    # Avoid re-adding a store path into the store
+    path = toStorePath target;
+  in
   writeScript "startup" ''
     #!/bin/sh
-    .${nix-user-chroot'}/bin/nix-user-chroot -n ./nix ${nixUserChrootFlags} -- ${target}${run} $@
+    .${nix-user-chroot'}/bin/nix-user-chroot -n ./nix ${nixUserChrootFlags} -- ${path}${run} "$@"
   '';
 
   nix-bootstrap = { target, extraTargets ? [], run, nix-user-chroot' ? nix-user-chroot, nixUserChrootFlags ? "" }:
