@@ -11,11 +11,10 @@ let
   });
 in rec {
   toStorePath = target:
-    # If a store path has been given, transform it to a string. And make sure
-    # to capture the store path in its context.
-    if lib.isStorePath target then
-      let path = toString target; in
-      builtins.appendContext path { "${path}" = { path = true; }; }
+    # If a store path has been given but is a string, add the missing context
+    # to it so it will be propagated properly as a build input.
+    if builtins.isString target && lib.isStorePath target then
+      builtins.appendContext target { "${target}" = { path = true; }; }
     # Otherwise, add to the store. This takes care of appending the store path
     # in the context automatically.
     else "${target}";
