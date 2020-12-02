@@ -59,5 +59,5 @@ elif [ -t 1 ]; then
   echo "Nix bundle created at $filename."
   cp -f "$out" "$filename"
 else
-  cat "$out"
+  echo "$out"
 fi
