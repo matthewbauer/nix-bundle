@@ -13,7 +13,7 @@
         nix-bundle = import self { nixpkgs = nixpkgs'; };
         script = nixpkgs'.writeScript "startup" ''
           #!/bin/sh
-          .${nix-bundle.nix-user-chroot}/bin/nix-user-chroot -n ./nix -- ${program} $@
+          .${nix-bundle.nix-user-chroot}/bin/nix-user-chroot -n ./nix -- ${program} "$@"
         '';
       in nix-bundle.makebootstrap {
         targets = [ script ];
