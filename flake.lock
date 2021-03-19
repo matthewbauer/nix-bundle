@@ -1,0 +1,42 @@
+{
+  "nodes": {
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1616703943,
+        "narHash": "sha256-0gBKjK81fuj7qvfM439CRlR3e4yjYMenPYvBKU7YH/s=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "1eea37190739485a01f5036558cd2ff257985678",
+        "type": "github"
+      },
+      "original": {
+        "id": "nixpkgs",
+        "ref": "nixos-20.03-small",
+        "type": "indirect"
+      }
+    },
+    "nixpkgs-appimagekit": {
+      "locked": {
+        "lastModified": 1617929752,
+        "narHash": "sha256-ji0nqJUZp2bfHvO0sKxD24cW6Nk7LyjbPPMxjbJHji0=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "6fc2b7ecc2a167ce6a6902d5417daf1fa5cac777",
+        "type": "github"
+      },
+      "original": {
+        "id": "nixpkgs",
+        "ref": "master",
+        "type": "indirect"
+      }
+    },
+    "root": {
+      "inputs": {
+        "nixpkgs": "nixpkgs",
+        "nixpkgs-appimagekit": "nixpkgs-appimagekit"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

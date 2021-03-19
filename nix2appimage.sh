@@ -19,7 +19,7 @@ fi
 
 target="$1"
 
-expr="with import <nixpkgs> {}; with import ./appimage-top.nix {}; appimage (appdir { name = \"$target\"; target = $target; })"
+expr="with import <nixpkgs> {}; with import ./appimage {}; appimage { name = \"$target\"; target = $target; }"
 
 out=$(nix-store --no-gc-warning -r $(nix-instantiate --no-gc-warning -E "$expr"))
 

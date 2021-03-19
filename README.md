@@ -74,7 +74,7 @@ NIX_PATH="nixpkgs=https://github.com/matthewbauer/nixpkgs/archive/nix-bundle.tar
 
 This will create a file at Emacs-x86_64.AppImage which you can execute.
 
-Notice that there is only one argument for nix2appimage.sh. This is because the target executable will be detected from the .desktop file in ```/share/applications/*.desktop```. As a side-effect, AppImage requires your package to have a .desktop file, so packages like "hello", "coreutils", etc. will not work.
+Notice that there is only one argument for nix2appimage.sh. This is because the target executable will be detected from the .desktop file in ```/share/applications/*.desktop```. If there is no .desktop file, nix2appimage will attempt to create one. If, however, there are more than one executable in the bin/ directory, we can't pick one, and there will have to be a .desktop file.
 
 Some other examples to try:
 
@@ -96,7 +96,9 @@ Some other examples to try:
 
 These may take a while because of the large closure size.
 
-Note that these do not currently work out of the box with NixOS. Other Linux distros should work.
+Note that these do not currently work out of the box with NixOS (but can be run through the `appimage-run` command). Other Linux distros should work. An additional limitation is that the machine running the AppImage must have a glibc at least as new as the one used to compile, so it is usually a good idea to pull an old version of glibc for your compilation.
+
+If you are using flakes, nix-bundle exports the overlay `nix-bundle.overlays.glibc_2_24.${system}` for this purpose, which will pull in glibc 2.24, and will thus be compatible with almost every popular distro's supported releases. Be forewarned that this has to rebuild pretty much everything in nixpkgs and takes a *long* time. Also note that some packages (e.g. Firefox) do their own glibc versioning, and so don't need this; better to test your package on an old distro without this overlay first.
 
 ## Comparison with AppImage, FlatPak, Snappy
 
