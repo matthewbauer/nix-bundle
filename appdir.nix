@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, muslPkgs, perl, pathsFromGraph, fetchFromGitHub, coreutils, bash }:
+{ stdenv, lib, fetchurl, muslPkgs, perl, pathsFromGraph, fetchFromGitHub, coreutils, bash }:
 
 let
   AppRun = targets: muslPkgs.stdenv.mkDerivation {
@@ -8,7 +8,7 @@ let
 
     buildPhase = ''
       CC="$CC -O2 -Wall -Wno-deprecated-declarations -Wno-unused-result -static"
-      $CC ${./AppRun.c} -o AppRun -DENV_PATH='"${stdenv.lib.makeBinPath targets}"'
+      $CC ${./AppRun.c} -o AppRun -DENV_PATH='"${lib.makeBinPath targets}"'
     '';
 
     installPhase = ''
