@@ -44,7 +44,7 @@ in rec {
     };
 
   # TODO: eventually should this go in nixpkgs?
-  nix-user-chroot = stdenv.lib.makeOverridable stdenv.mkDerivation {
+  nix-user-chroot = lib.makeOverridable stdenv.mkDerivation {
     name = "nix-user-chroot-2c52b5f";
     src = ./nix-user-chroot;
 
@@ -108,7 +108,7 @@ in rec {
     nix-user-chroot'' = targets: nix-user-chroot.overrideDerivation (o: {
       buildInputs = o.buildInputs ++ targets;
       makeFlags = o.makeFlags ++ [
-        ''ENV_PATH="${stdenv.lib.makeBinPath targets}"''
+        ''ENV_PATH="${lib.makeBinPath targets}"''
       ];
     }); in { target, extraTargets ? [], run }: nix-bootstrap {
       inherit target extraTargets run;

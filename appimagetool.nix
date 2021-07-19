@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, fuse, zlib, squashfsTools, glib }:
+{ stdenv, lib, fetchurl, fuse, zlib, squashfsTools, glib }:
 
 # This is from some binaries.
 
@@ -37,7 +37,7 @@ in stdenv.mkDerivation rec {
     for x in $out/bin/*; do
       patchelf \
         --set-interpreter ${dynamicLinker} \
-        --set-rpath ${stdenv.lib.makeLibraryPath [ zlib stdenv.glibc.out fuse glib ]} \
+        --set-rpath ${lib.makeLibraryPath [ zlib stdenv.glibc.out fuse glib ]} \
         $x
     done
   '';
