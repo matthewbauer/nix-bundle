@@ -11,13 +11,38 @@
 , binutils
 }:
 
-{ target
-, name ? target.pname
+let
+  # strip everything after /nix/store/*
+  appendContextOf = str: newstr:
+    with builtins;
+    appendContext newstr (getContext str);
+
+  splitStorePath = path:
+    with builtins;
+    match "(${storeDir}/[^\/]+)/(.+)" path;
+
+  targetFromProgram = program:
+    with builtins;
+    appendContextOf program (head (splitStorePath program));
+
+  execFromProgram = program:
+    with builtins;
+    elemAt (splitStorePath program) 1;
+
+  nameFromProgram = program:
+    with builtins;
+    unsafeDiscardStringContext (baseNameOf program);
+in
+
+# You should supply exactly one of program, target
+{ program ? null
+, target ? targetFromProgram program
+, name ? target.pname or nameFromProgram program
 , extraTargets ? [ coreutils bash ]
 
 # Specify which executable to run (relative to ${target} directory).
 # Only needed if you have multiple binaries and no .desktop file.
-, exec ? ""
+, exec ? if program == null then "" else execFromProgram program
 
 # Packages and individual shared libraries to exclude from the output path. This
 # can reduce appimage size, but you have to know they are either not needed at
@@ -123,7 +148,7 @@ in stdenv.mkDerivation {
     if [ -z "$desktop" ]; then
       desktop=.${target}/share/applications/${name}.desktop
 
-      exec=${exec}
+      exec=usr/${exec}
       # user didn't supply an executable. we'll look for one
       if [ -z "$exec" ]; then
         exec=$(find usr/bin -executable -xtype f)
