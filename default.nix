@@ -80,19 +80,20 @@ in rec {
       };
     };
 
-  makeStartup = { target, nixUserChrootFlags, nix-user-chroot', run }:
+  makeStartup = { target, nixUserChrootFlags, nix-user-chroot', run, initScript }:
   let
     # Avoid re-adding a store path into the store
     path = toStorePath target;
   in
   writeScript "startup" ''
     #!/bin/sh
+    ${initScript}
     .${nix-user-chroot'}/bin/nix-user-chroot -n ./nix ${nixUserChrootFlags} -- ${path}${run} "$@"
   '';
 
-  nix-bootstrap = { target, extraTargets ? [], run, nix-user-chroot' ? nix-user-chroot, nixUserChrootFlags ? "" }:
+  nix-bootstrap = { target, extraTargets ? [], run, nix-user-chroot' ? nix-user-chroot, nixUserChrootFlags ? "", initScript ? "" }:
     let
-      script = makeStartup { inherit target nixUserChrootFlags nix-user-chroot' run; };
+      script = makeStartup { inherit target nixUserChrootFlags nix-user-chroot' run initScript; };
     in makebootstrap {
       startup = ".${script} '\"$@\"'";
       targets = [ "${script}" ] ++ extraTargets;
@@ -111,8 +112,8 @@ in rec {
       makeFlags = o.makeFlags ++ [
         ''ENV_PATH="${lib.makeBinPath targets}"''
       ];
-    }); in { target, extraTargets ? [], run }: nix-bootstrap {
-      inherit target extraTargets run;
+    }); in { target, extraTargets ? [], run, initScript ? "" }: nix-bootstrap {
+      inherit target extraTargets run initScript;
       nix-user-chroot' = nix-user-chroot'' extraTargets;
     };
 }
