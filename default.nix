@@ -49,6 +49,10 @@ in rec {
     name = "nix-user-chroot-2c52b5f";
     src = ./nix-user-chroot;
 
+    buildInputs = [
+      stdenv.cc.cc.libgcc or null
+    ];
+
     makeFlags = [];
 
     # hack to use when /nix/store is not available
