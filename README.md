@@ -98,14 +98,14 @@ These may take a while because of the large closure size.
 
 Note that these do not currently work out of the box with NixOS. Other Linux distros should work.
 
-## Comparison with AppImage, FlatPak, Snappy
+## Comparison with AppImage, FlatPak, Snap
 
 | Name       | Distro-agnostic | Runtime required | Root required | Storage |
 | ---------- | --------------- | ---------------- | ------------- | ------- |
 | nix-bundle | yes | no  | no  | Arx tarball                    | 
 | AppImage   | yes | no  | no  | Squashfs w/ lzma compression   |
 | FlatPak    | yes | yes | no  | ?                              |
-| Snappy     | yes | yes | no  | squashFS                       |
+| Snap       | yes | yes | no  | squashFS                       |
 
 ## How it works
 
