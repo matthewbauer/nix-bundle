@@ -1,7 +1,7 @@
 {
   description = "The purely functional package manager";
 
-  inputs.nixpkgs.url = "nixpkgs/nixos-20.03-small";
+  inputs.nixpkgs.url = "nixpkgs/nixos-23.05";
 
   outputs = { self, nixpkgs }: let
     systems = [ "x86_64-linux" "i686-linux" "aarch64-linux" ];
