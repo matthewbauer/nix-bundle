@@ -106,7 +106,7 @@ in rec {
   nix-bootstrap-nix = {target, run, extraTargets ? []}:
     nix-bootstrap-path {
       inherit target run;
-      extraTargets = [ gnutar bzip2 xz gzip coreutils bash ];
+      extraTargets = [ gnutar bzip2 xz gzip coreutils bash ] ++ extraTargets;
     };
 
   # special case adding path to the environment before launch
