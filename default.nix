@@ -37,9 +37,14 @@ in rec {
       buildCommand = ''
         storePaths=$(perl ${pathsFromGraph} ./closure-*)
 
+        # see https://lists.gnu.org/archive/html/help-tar/2015-05/msg00006.html
+        # `default.nix` for mtime is arbitrary - Nix should zero-out the timestamp
+        # for any file in the store
         tar -cf - \
           --owner=0 --group=0 --mode=u+rw,uga+r \
           --hard-dereference \
+          --mtime=${./default.nix} \
+          --sort=name \
           $storePaths | bzip2 -z > $out
       '';
     };
